@@ -24,3 +24,20 @@ Homestead.yaml
 Thumbs.db
 # Antigravity generated scripts
 populate_*.php
+# Manual testing scripts
+test_*.php
+run_*.php
+
+# Debug scripts
+alter_enum.php
+check_counts.php
+describe_risk_scores.php
+get_tables_schema.php
+get_top_bottom.php
+
+# API response files
+api_response*.txt
+
+# Backup / temporary files
+*.bak
+*.tmp

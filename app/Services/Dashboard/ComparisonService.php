@@ -9,6 +9,6 @@ class ComparisonService
         if (empty($countryIds)) {
             return collect();
         }
-        return Country::whereIn('id', $countryIds)->get();
+        return Country::with('economicIndicator')->whereIn('id', $countryIds)->get();
     }
 }

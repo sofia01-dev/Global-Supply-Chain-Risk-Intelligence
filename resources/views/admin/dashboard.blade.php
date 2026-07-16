@@ -1,48 +1,36 @@
 @extends('layouts.app')
 @section('content')
-<div class="row mb-4">
-    <div class="col"><h2>Admin Dashboard</h2></div>
-</div>
-<div class="row g-4">
-    <div class="col-md-3">
-        <div class="card text-center bg-primary text-white">
-            <div class="card-body">
-                <h5>Total Users</h5>
-                <h2>{{ $summary['total_users'] ?? 0 }}</h2>
+<div class="container">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    @if(empty($summary))
+        <div class="alert alert-info">Dashboard data is currently unavailable.</div>
+    @else
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white text-center p-3">
+                    <h3>{{ $summary['total_users'] ?? 0 }}</h3>
+                    <p>Users</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white text-center p-3">
+                    <h3>{{ $summary['total_countries'] ?? 0 }}</h3>
+                    <p>Countries</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white text-center p-3">
+                    <h3>{{ $summary['total_ports'] ?? 0 }}</h3>
+                    <p>Ports</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark text-center p-3">
+                    <h3>{{ $summary['total_shipments'] ?? 0 }}</h3>
+                    <p>Shipments</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center bg-success text-white">
-            <div class="card-body">
-                <h5>Total Countries</h5>
-                <h2>{{ $summary['total_countries'] ?? 0 }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center bg-info text-white">
-            <div class="card-body">
-                <h5>Total Ports</h5>
-                <h2>{{ $summary['total_ports'] ?? 0 }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center bg-warning">
-            <div class="card-body">
-                <h5>Total Shipments</h5>
-                <h2>{{ $summary['total_shipments'] ?? 0 }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="card text-center bg-secondary text-white">
-            <div class="card-body">
-                <h5>Total Articles</h5>
-                <h2>{{ $summary['total_articles'] ?? 0 }}</h2>
-            </div>
-        </div>
-    </div>
+    @endif
 </div>
 @endsection

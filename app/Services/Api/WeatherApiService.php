@@ -1,11 +1,78 @@
 <?php
 namespace App\Services\Api;
+
+use App\Models\Country;
 use App\Models\WeatherCache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Exception;
+use Carbon\Carbon;
 
 class WeatherApiService
 {
-    public function getAllWeather()
+    public function getAllWeatherWithCountries($search = null)
     {
-        return WeatherCache::with(['country', 'port'])->get();
+        $query = Country::whereHas('weatherCaches')->with('weatherCaches');
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+        return $query->orderBy('name')->get();
+    }
+
+    public function syncWeather()
+    {
+        $countries = Country::whereNotNull('latitude')->whereNotNull('longitude')->get();
+        $syncedData = collect();
+
+        foreach ($countries as $country) {
+            try {
+                usleep(100000); // 100ms delay for Open-Meteo rate limits
+                $lat = $country->latitude;
+                $lng = $country->longitude;
+                
+                $response = Http::timeout(15)->retry(2, 100)->get("https://api.open-meteo.com/v1/forecast", [
+                    'latitude' => $lat,
+                    'longitude' => $lng,
+                    'current' => 'temperature_2m,relative_humidity_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,weather_code',
+                    'daily' => 'sunrise,sunset',
+                    'hourly' => 'temperature_2m',
+                    'timezone' => 'auto'
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (is_array($data) && isset($data['current'])) {
+                        $current = $data['current'];
+                        $weather = WeatherCache::updateOrCreate(
+                            ['country_id' => $country->id],
+                            [
+                                'temperature' => $current['temperature_2m'] ?? null,
+                                'wind_speed' => $current['wind_speed_10m'] ?? null,
+                                'condition' => $this->mapWeatherCode($current['weather_code'] ?? 0),
+                                'raw_data' => $data,
+                                'expires_at' => Carbon::now()->addHours(2),
+                            ]
+                        );
+                        $syncedData->push($weather);
+                    }
+                } else {
+                    Log::warning("Weather API failed for country {$country->name}: " . $response->status());
+                }
+            } catch (\Throwable $e) {
+                Log::error("WeatherApiService Error for {$country->name}: " . $e->getMessage());
+                // Continue to next country
+            }
+        }
+        return $syncedData;
+    }
+
+    private function mapWeatherCode($code)
+    {
+        if ($code == 0) return 'Clear';
+        if ($code >= 1 && $code <= 3) return 'Cloudy';
+        if ($code >= 51 && $code <= 67) return 'Rain';
+        if ($code >= 71 && $code <= 77) return 'Snow';
+        if ($code >= 95 && $code <= 99) return 'Thunderstorm';
+        return 'Unknown';
     }
 }

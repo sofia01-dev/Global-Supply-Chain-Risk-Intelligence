@@ -38,6 +38,11 @@ class Country extends Model
         return $this->hasMany(RiskScore::class);
     }
 
+    public function riskScoreHistories()
+    {
+        return $this->hasMany(RiskScoreHistory::class);
+    }
+
     public function weatherCaches()
     {
         return $this->hasMany(WeatherCache::class);
@@ -51,5 +56,25 @@ class Country extends Model
     public function watchlists()
     {
         return $this->hasMany(Watchlist::class);
+    }
+
+    public function economicIndicator()
+    {
+        return $this->hasOne(EconomicIndicator::class);
+    }
+
+    public function getGdpAttribute($value)
+    {
+        return $this->economicIndicator->gdp ?? $value;
+    }
+
+    public function getInflationRateAttribute($value)
+    {
+        return $this->economicIndicator->inflation_rate ?? $value;
+    }
+
+    public function getPopulationAttribute($value)
+    {
+        return $this->economicIndicator->population ?? $value;
     }
 }
