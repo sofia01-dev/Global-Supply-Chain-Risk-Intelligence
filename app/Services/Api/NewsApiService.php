@@ -18,7 +18,7 @@ class NewsApiService
             $response = Http::timeout(15)->retry(2, 100)->get('https://gnews.io/api/v4/search', [
                 'q' => $query,
                 'lang' => 'en',
-                'max' => 10,
+                'max' => 30,
                 'apikey' => $apiKey
             ]);
 
@@ -30,9 +30,8 @@ class NewsApiService
                     
                     // Retrieve Lexicon Sentiment Service
                     $sentimentService = app(\App\Services\AI\LexiconSentimentService::class);
-                    // Retrieve a random country id for demo mapping if no direct country mapping is available from gnews
-                    $countries = \App\Models\Country::pluck('id')->toArray();
-
+                    // Remove random country mapping for global sync
+                    
                     foreach ($articles as $article) {
                         $title = $article['title'] ?? '';
                         $desc = $article['description'] ?? '';
@@ -51,24 +50,17 @@ class NewsApiService
                         
                         $sentimentLabel = $sentimentService->analyzeText($content);
                         
-                        $countryId = null;
-                        if (!empty($countries)) {
-                            $countryId = $countries[array_rand($countries)];
-                        }
+                        $countryId = null; // Global news remains global
 
                         $news = NewsCache::updateOrCreate(
                             ['url' => substr($article['url'], 0, 500)],
                             [
                                 'title' => substr($title, 0, 500),
+                                'image_url' => $article['image'] ?? null,
                                 'category' => $category,
                                 'country_id' => $countryId,
                                 'sentiment_label' => $sentimentLabel,
                                 'published_at' => isset($article['publishedAt']) ? Carbon::parse($article['publishedAt'])->format('Y-m-d H:i:s') : now(),
-                                // Assuming we store image url in the 'url' or another column if we have one. 
-                                // Wait, the existing NewsCache doesn't have an image_url column. 
-                                // Let's check NewsCache fillable. It has title, url, category, country_id, sentiment_label, published_at. 
-                                // No image_url. We'll skip image from db, or we can just add it if we modify migration, but user said "Jangan mengubah struktur database jika tidak diperlukan." 
-                                // We can't save thumbnail without column. 
                             ]
                         );
                         $syncedData->push($news);
@@ -80,6 +72,70 @@ class NewsApiService
             }
         } catch (\Throwable $e) {
             Log::error('NewsApiService Error: ' . $e->getMessage());
+        }
+        return collect([]);
+    }
+
+    public function syncNewsForCountry(\App\Models\Country $country)
+    {
+        try {
+            $apiKey = env('GNEWS_API_KEY', 'demo'); 
+            // Broaden search: any of these keywords + country name
+            $query = '("logistics" OR "supply chain" OR "economy" OR "trade") AND "' . $country->name . '"';
+            
+            $response = Http::timeout(15)->retry(2, 100)->get('https://gnews.io/api/v4/search', [
+                'q' => $query,
+                'lang' => 'en',
+                'max' => 5,
+                'apikey' => $apiKey
+            ]);
+
+            if ($response->successful()) {
+                $json = $response->json();
+                if (is_array($json) && isset($json['articles'])) {
+                    $articles = $json['articles'];
+                    $syncedData = collect();
+                    
+                    $sentimentService = app(\App\Services\AI\LexiconSentimentService::class);
+
+                    foreach ($articles as $article) {
+                        $title = $article['title'] ?? '';
+                        $desc = $article['description'] ?? '';
+                        $content = strtolower($title . ' ' . $desc);
+                        
+                        $category = 'Global';
+                        if (strpos($content, 'shipping') !== false) {
+                            $category = 'Shipping';
+                        } elseif (strpos($content, 'logistics') !== false || strpos($content, 'supply chain') !== false) {
+                            $category = 'Logistics';
+                        } elseif (strpos($content, 'trade') !== false) {
+                            $category = 'Trade';
+                        } else {
+                            $category = 'Economy';
+                        }
+                        
+                        $sentimentLabel = $sentimentService->analyzeText($content);
+
+                        $news = NewsCache::updateOrCreate(
+                            ['url' => substr($article['url'], 0, 500)],
+                            [
+                                'title' => substr($title, 0, 500),
+                                'image_url' => $article['image'] ?? null,
+                                'category' => $category,
+                                'country_id' => $country->id, // Specifically assign to this country
+                                'sentiment_label' => $sentimentLabel,
+                                'published_at' => isset($article['publishedAt']) ? Carbon::parse($article['publishedAt'])->format('Y-m-d H:i:s') : now(),
+                            ]
+                        );
+                        $syncedData->push($news);
+                    }
+                    return $syncedData;
+                }
+            } else {
+                Log::warning('News API (Country) failed: ' . $response->status() . ' - ' . $response->body());
+            }
+        } catch (\Throwable $e) {
+            Log::error('NewsApiService Country Sync Error: ' . $e->getMessage());
         }
         return collect([]);
     }

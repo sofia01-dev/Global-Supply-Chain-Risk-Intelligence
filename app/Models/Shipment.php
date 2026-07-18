@@ -8,6 +8,8 @@ class Shipment extends Model
 {
     protected $fillable = [
         'user_id',
+        'shipment_name',
+        'goods',
         'shipment_code',
         'origin_port_id',
         'destination_port_id',

@@ -79,12 +79,11 @@
                         <div class="col-md-4">
                             <label class="form-label text-muted small fw-bold">{{ __('Current Status') }}</label>
                             <select name="current_status" class="form-select form-select-lg border-0 shadow-sm bg-white" required>
-                                <option value="Pending" {{ $shipment->current_status == 'Pending' ? 'selected' : '' }}>{{ __('Pending') }}</option>
-                                <option value="In Transit" {{ $shipment->current_status == 'In Transit' ? 'selected' : '' }}>{{ __('In Transit') }}</option>
-                                <option value="Delayed" {{ $shipment->current_status == 'Delayed' ? 'selected' : '' }}>{{ __('Delayed') }}</option>
-                                <option value="At Risk" {{ $shipment->current_status == 'At Risk' ? 'selected' : '' }}>{{ __('At Risk') }}</option>
-                                <option value="Delivered" {{ $shipment->current_status == 'Delivered' ? 'selected' : '' }}>{{ __('Delivered') }}</option>
-                                <option value="Cancelled" {{ $shipment->current_status == 'Cancelled' ? 'selected' : '' }}>{{ __('Cancelled') }}</option>
+                                <option value="pending" {{ $shipment->current_status == 'pending' ? 'selected' : '' }}>{{ __('Pending') }}</option>
+                                <option value="transit" {{ $shipment->current_status == 'transit' ? 'selected' : '' }}>{{ __('Transit') }}</option>
+                                <option value="delayed" {{ $shipment->current_status == 'delayed' ? 'selected' : '' }}>{{ __('Delayed') }}</option>
+                                <option value="arrived" {{ $shipment->current_status == 'arrived' ? 'selected' : '' }}>{{ __('Arrived') }}</option>
+                                <option value="delivered" {{ $shipment->current_status == 'delivered' ? 'selected' : '' }}>{{ __('Delivered') }}</option>
                             </select>
                         </div>
                     </div>

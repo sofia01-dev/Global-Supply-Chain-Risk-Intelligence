@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container d-flex justify-content-center">
-    <div class="auth-container w-100">
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">Register</div>
-            <div class="card-body">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="w-100" style="max-width: 450px;">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header text-white py-3 fs-5 fw-bold d-flex justify-content-center align-items-center" style="background-color: var(--primary-navy); border-bottom: none;">Register</div>
+            <div class="card-body p-4">
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
                     
@@ -32,8 +32,13 @@
                         <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success">Register</button>
+                    <div class="d-grid gap-2 mt-4 mb-2">
+                        <button type="submit" class="btn text-white py-2 fw-bold" style="background-color: var(--primary-navy); border-radius: 8px;">Register</button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <span class="text-muted" style="font-size: 0.9rem;">Sudah punya akun?</span> 
+                        <a href="{{ route('login') }}" class="text-decoration-none fw-bold" style="color: var(--primary-navy); font-size: 0.9rem;">Login di sini</a>
                     </div>
                 </form>
             </div>

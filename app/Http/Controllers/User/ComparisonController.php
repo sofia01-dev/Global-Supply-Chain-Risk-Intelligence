@@ -11,8 +11,19 @@ class ComparisonController extends Controller
         $this->comparisonService = $comparisonService;
     }
     public function index(Request $request) {
-        $countryIds = $request->input('countries', []);
-        $countries = $this->comparisonService->getComparisonData($countryIds);
+        $countries = \App\Models\Country::orderBy('name')->get();
         return view('user.comparison', compact('countries'));
+    }
+
+    public function compareAjax(Request $request) {
+        $countryAId = $request->input('country_a');
+        $countryBId = $request->input('country_b');
+
+        if (!$countryAId || !$countryBId) {
+            return response()->json(['error' => 'Please select both countries'], 400);
+        }
+
+        $data = $this->comparisonService->getComparisonData($countryAId, $countryBId);
+        return response()->json($data);
     }
 }

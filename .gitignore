@@ -41,3 +41,6 @@ api_response*.txt
 # Backup / temporary files
 *.bak
 *.tmp
+
+add_translations.php
+seed_currency.php

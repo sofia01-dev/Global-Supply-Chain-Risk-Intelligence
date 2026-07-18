@@ -67,4 +67,37 @@ class WorldBankApiService
         
         return null;
     }
+
+    public function fetchGlobalHistoricalTrend($indicatorCode, $yearsBack = 7)
+    {
+        $currentYear = date('Y') - 1; // Bank data usually lags by 1 year
+        $startYear = $currentYear - $yearsBack + 1;
+        
+        $url = "https://api.worldbank.org/v2/country/WLD/indicator/{$indicatorCode}?date={$startYear}:{$currentYear}&format=json";
+        
+        try {
+            $response = Http::timeout(15)->retry(3, 200)->get($url);
+            
+            if ($response->successful()) {
+                $json = $response->json();
+                if (is_array($json) && isset($json[1]) && is_array($json[1])) {
+                    $data = [];
+                    foreach ($json[1] as $record) {
+                        if (isset($record['date']) && isset($record['value']) && $record['value'] !== null) {
+                            $data[$record['date']] = $record['value'];
+                        }
+                    }
+                    // Sort by year ascending
+                    ksort($data);
+                    return $data;
+                }
+            } else {
+                Log::warning("WorldBank API Historical {$indicatorCode} failed: " . $response->status());
+            }
+        } catch (\Throwable $e) {
+            Log::error("WorldBank API Historical Exception for {$indicatorCode}: " . $e->getMessage());
+        }
+
+        return null;
+    }
 }

@@ -2,95 +2,101 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-8">
+    <div class="col-lg-10 col-xl-10">
         
         <!-- Header -->
         <div class="d-flex align-items-center mb-4">
-            <a href="{{ route('user.shipments.index') }}" class="btn btn-light rounded-circle shadow-sm me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <i class="bi bi-arrow-left"></i>
-            </a>
+            <div class="me-3 p-3 bg-white shadow-sm rounded-3">
+                <i class="bi bi-box-seam fs-3 text-primary"></i>
+            </div>
             <div>
-                <h3 class="fw-bold mb-0 text-dark">{{ __('Add New Shipment') }}</h3>
-                <p class="text-muted mb-0 small">{{ __('Register a new logistics route for AI risk monitoring') }}</p>
+                <h3 class="fw-bold mb-0 text-dark">{{ __('Create New Shipment') }}</h3>
+                <p class="text-muted mb-0">{{ __('Fill in the information to create a new shipment') }}</p>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="card-header bg-white border-0 py-4 px-4 px-md-5">
-                <h5 class="fw-bold text-primary mb-0"><i class="bi bi-box-seam me-2"></i>{{ __('Shipment Details') }}</h5>
-            </div>
-            
-            <div class="card-body px-4 px-md-5 pb-5">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
                 <form action="{{ route('user.shipments.store') }}" method="POST">
                     @csrf
                     
-                    <!-- Route Section -->
-                    <div class="p-4 bg-light rounded-4 mb-4 position-relative border border-primary border-opacity-10">
-                        <span class="badge bg-primary position-absolute top-0 start-0 translate-middle-y ms-4 px-3">{{ __('Logistics Route') }}</span>
-                        
-                        <div class="row g-4 position-relative pt-2">
-                            <!-- Removed connector line based on user request -->
-                            
-                            <div class="col-md-6 z-index-2 position-relative" style="z-index: 2;">
-                                <label class="form-label text-muted small fw-bold"><i class="bi bi-geo-alt-fill text-primary me-1"></i>{{ __('Origin Port') }}</label>
-                                <select name="origin_port_id" class="form-select border-0 shadow-sm py-2" required>
-                                    <option value="">{{ __('Select Origin...') }}</option>
-                                    @foreach($ports as $port)
-                                        <option value="{{ $port->id }}">{{ $port->name }} ({{ __($port->country->name ?? 'Unknown') }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-6 z-index-2 position-relative" style="z-index: 2;">
-                                <label class="form-label text-muted small fw-bold"><i class="bi bi-flag-fill text-success me-1"></i>{{ __('Destination Port') }}</label>
-                                <select name="destination_port_id" class="form-select border-0 shadow-sm py-2" required>
-                                    <option value="">{{ __('Select Destination...') }}</option>
-                                    @foreach($ports as $port)
-                                        <option value="{{ $port->id }}">{{ $port->name }} ({{ __($port->country->name ?? 'Unknown') }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    <div class="row g-4">
+                        <!-- Shipment Name -->
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Shipment Name') }}</label>
+                            <input type="text" name="shipment_name" class="form-control form-control-lg border-light bg-light" placeholder="e.g. Import Laptop Juli" required>
                         </div>
-                    </div>
 
-                    <!-- Schedule & Status Section -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">{{ __('Departure Date') }}</label>
-                            <div class="input-group input-group-lg shadow-sm rounded-3">
-                                <span class="input-group-text bg-white border-0 text-muted"><i class="bi bi-calendar-check"></i></span>
-                                <input type="date" name="departure_date" class="form-control border-0 bg-white" required>
-                            </div>
+                        <!-- Goods -->
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Goods') }}</label>
+                            <input type="text" name="goods" class="form-control form-control-lg border-light bg-light" placeholder="e.g. Laptop" required>
                         </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">{{ __('Est. Arrival Date') }}</label>
-                            <div class="input-group input-group-lg shadow-sm rounded-3">
-                                <span class="input-group-text bg-white border-0 text-muted"><i class="bi bi-calendar-event"></i></span>
-                                <input type="date" name="estimated_arrival" class="form-control border-0 bg-white" required>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small fw-bold">{{ __('Current Status') }}</label>
-                            <select name="current_status" class="form-select form-select-lg border-0 shadow-sm bg-white" required>
-                                <option value="Pending">{{ __('Pending') }}</option>
-                                <option value="In Transit">{{ __('In Transit') }}</option>
-                                <option value="Delayed">{{ __('Delayed') }}</option>
-                                <option value="At Risk">{{ __('At Risk') }}</option>
-                                <option value="Delivered">{{ __('Delivered') }}</option>
-                                <option value="Cancelled">{{ __('Cancelled') }}</option>
+
+                        <!-- Origin Section -->
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Origin Country') }}</label>
+                            <select id="origin_country" class="form-select form-select-lg border-light bg-light" required>
+                                <option value="">{{ __('Select Country') }}</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                @endforeach
                             </select>
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Origin Port') }}</label>
+                            <select id="origin_port" name="origin_port_id" class="form-select form-select-lg border-light bg-light" required disabled>
+                                <option value="">{{ __('Select Port') }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Destination Section -->
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Destination Country') }}</label>
+                            <select id="dest_country" class="form-select form-select-lg border-light bg-light" required>
+                                <option value="">{{ __('Select Country') }}</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Destination Port') }}</label>
+                            <select id="dest_port" name="destination_port_id" class="form-select form-select-lg border-light bg-light" required disabled>
+                                <option value="">{{ __('Select Port') }}</option>
+                            </select>
+                        </div>
+
+                        <!-- ETA & Status -->
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold">{{ __('Estimated Arrival (ETA)') }}</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text border-light bg-light"><i class="bi bi-calendar"></i></span>
+                                <input type="date" name="estimated_arrival" class="form-control border-light bg-light" required>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Required Fields with Defaults -->
+                        <input type="hidden" name="departure_date" value="{{ date('Y-m-d') }}">
+                        <input type="hidden" name="current_status" value="pending">
                     </div>
 
-                    <hr class="text-muted opacity-25 my-4">
-
-                    <div class="d-flex justify-content-end gap-3 mt-4">
-                        <a href="{{ route('user.shipments.index') }}" class="btn btn-light px-4 rounded-pill fw-medium border">{{ __('Cancel') }}</a>
-                        <button type="submit" class="btn btn-primary px-5 rounded-pill fw-bold shadow-sm">
-                            {{ __('Register Shipment') }} <i class="bi bi-check-circle ms-1"></i>
-                        </button>
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+                        <div class="text-primary bg-primary bg-opacity-10 px-4 py-3 rounded-3 d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <small class="d-block">{{ __('Shipment code will be generated automatically after saving.') }}</small>
+                                <small class="fw-bold">{{ __('Example: SHP-20260711-0001') }}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a href="{{ route('user.shipments.index') }}" class="btn btn-light px-4 py-2 rounded-3 fw-medium">{{ __('Cancel') }}</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 fw-bold shadow-sm">
+                                {{ __('Create Shipment') }}
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -98,4 +104,45 @@
         
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function loadPorts(countrySelectId, portSelectId) {
+        const countryId = document.getElementById(countrySelectId).value;
+        const portSelect = document.getElementById(portSelectId);
+        
+        portSelect.innerHTML = '<option value="">{{ __("Loading...") }}</option>';
+        portSelect.disabled = true;
+
+        if(!countryId) {
+            portSelect.innerHTML = '<option value="">{{ __("Select Port") }}</option>';
+            return;
+        }
+
+        fetch(`/user/shipments/api/ports/${countryId}`)
+            .then(res => res.json())
+            .then(data => {
+                portSelect.innerHTML = '<option value="">{{ __("Select Port") }}</option>';
+                data.forEach(port => {
+                    portSelect.innerHTML += `<option value="${port.id}">${port.name}</option>`;
+                });
+                portSelect.disabled = false;
+            })
+            .catch(err => {
+                portSelect.innerHTML = '<option value="">{{ __("Error loading ports") }}</option>';
+                console.error(err);
+            });
+    }
+
+    document.getElementById('origin_country').addEventListener('change', function() {
+        loadPorts('origin_country', 'origin_port');
+    });
+
+    document.getElementById('dest_country').addEventListener('change', function() {
+        loadPorts('dest_country', 'dest_port');
+    });
+});
+</script>
+@endpush
 @endsection

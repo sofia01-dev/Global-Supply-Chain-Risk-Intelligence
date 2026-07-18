@@ -15,7 +15,7 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --primary-navy: #0B1A3A;
+            --primary-navy: #3E53A0;
             --primary-blue: #1C55FF;
             --bg-light: #F4F7FE;
             --card-border-radius: 12px;
@@ -62,28 +62,30 @@
             flex-grow: 1;
         }
 
-        .nav-sidebar .nav-item { margin-bottom: 4px; padding: 0 15px; }
+        .nav-sidebar .nav-item { margin-bottom: 4px; padding: 0 0 0 15px; }
 
         .nav-sidebar .nav-link {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 15px;
+            padding: 12px 15px;
             color: rgba(255,255,255,0.7);
-            border-radius: 8px;
+            border-radius: 30px 0 0 30px;
             transition: all var(--transition-speed);
             font-size: 0.9rem;
             font-weight: 500;
             text-decoration: none;
         }
 
-        .nav-sidebar .nav-link:hover, .nav-sidebar .nav-link.active {
+        .nav-sidebar .nav-link:hover {
             color: #fff;
             background-color: rgba(255,255,255,0.1);
         }
         
         .nav-sidebar .nav-link.active {
-            background-color: var(--primary-blue);
+            background-color: var(--bg-light);
+            color: var(--primary-navy);
+            font-weight: 700;
         }
 
         /* Mini Cards in Sidebar */
@@ -222,10 +224,11 @@
             
             <ul class="nav-sidebar">
                 @if(Auth::user()->role === 'admin')
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2"></i> {{ __('Admin Dashboard') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><i class="bi bi-people"></i> {{ __('Manage Users') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.ports.*') ? 'active' : '' }}" href="{{ route('admin.ports.index') }}"><i class="bi bi-pin-map"></i> {{ __('Manage Ports') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><i class="bi bi-journal-text"></i> {{ __('Articles') }}</a></li>
+                    <div class="px-3 pb-2 text-uppercase" style="font-size: 0.65rem; color: #888; font-weight: 700; letter-spacing: 1px;">MAIN MENU</div>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><i class="bi bi-people"></i> User Management</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.ports.*') ? 'active' : '' }}" href="{{ route('admin.ports.index') }}"><i class="bi bi-pin-map"></i> Port Dataset</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><i class="bi bi-journal-text"></i> Analysis Articles</a></li>
                 @else
                     <div class="px-3 pb-2 text-uppercase" style="font-size: 0.65rem; color: #888; font-weight: 700; letter-spacing: 1px;">{{ __('Main Menu') }}</div>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" href="{{ route('user.dashboard') }}"><i class="bi bi-speedometer2"></i> {{ __('Dashboard') }}</a></li>
@@ -236,30 +239,27 @@
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.news') ? 'active' : '' }}" href="{{ route('user.news') }}"><i class="bi bi-newspaper"></i> {{ __('News Intelligence') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.ports.*') ? 'active' : '' }}" href="{{ route('user.ports.index') }}"><i class="bi bi-pin-map"></i> {{ __('Ports') }}</a></li>
 
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-bar-chart-line"></i> {{ __('Country Comparison') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-star"></i> {{ __('Favorite Monitoring') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.comparison') ? 'active' : '' }}" href="{{ route('user.comparison') }}"><i class="bi bi-bar-chart-line"></i> {{ __('Country Comparison') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.watchlist.index') ? 'active' : '' }}" href="{{ route('user.watchlist.index') }}"><i class="bi bi-star"></i> {{ __('Favorite Monitoring') }}</a></li>
                 @endif
             </ul>
 
 
             
             <!-- System Status -->
-            <div class="sidebar-widget mt-auto border border-secondary border-opacity-25" id="system-status-widget" style="background-color: transparent;">
-                <div class="d-flex flex-column gap-2">
-                    <h6 class="mb-0 text-muted" style="font-size: 0.7rem;">{{ __('System Status') }}</h6>
-                    
-                    <div class="d-flex align-items-center gap-2">
-                        <span id="sync-indicator" class="rounded-circle bg-success" style="width: 8px; height: 8px; box-shadow: 0 0 5px #198754;"></span>
-                        <span id="sync-text" class="text-white fw-medium" style="font-size: 0.75rem;">{{ __('All Systems Operational') }}</span>
-                    </div>
+            <div class="mt-auto px-3 py-3 border-top border-secondary border-opacity-25" id="system-status-widget" style="background-color: transparent;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-white-50 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('System Status') }}</span>
+                    <i class="bi bi-arrow-repeat text-white-50" id="sync-spinner" style="font-size: 0.8rem;"></i>
+                </div>
+                
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span id="sync-indicator" class="rounded-circle bg-success" style="width: 8px; height: 8px; box-shadow: 0 0 5px #198754;"></span>
+                    <span id="sync-text" class="text-white fw-medium" style="font-size: 0.75rem;">{{ __('All Systems Operational') }}</span>
+                </div>
 
-                    <div class="mt-1 d-flex flex-column gap-1 text-muted" style="font-size: 0.65rem;">
-                        <span>{{ __('Last Updated') }}</span>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span id="last-sync-time">{{ now()->format('d M Y H:i:s') }} WIB</span>
-                            <i class="bi bi-arrow-repeat" id="sync-spinner" style="font-size: 0.9rem;"></i>
-                        </div>
-                    </div>
+                <div class="text-white-50" style="font-size: 0.65rem;">
+                    <span id="last-sync-time">{{ now()->format('d M Y H:i:s') }}</span>
                 </div>
             </div>
         </div>
@@ -287,12 +287,6 @@
                         </ul>
                     </div>
                     
-                    <div class="icon-btn">
-                        <i class="bi bi-bell"></i>
-                        <span class="badge rounded-pill bg-danger">0</span>
-                    </div>
-
-                    
                     <div class="dropdown">
                         <div class="user-profile" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff" alt="User">
@@ -302,8 +296,6 @@
                             </div>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                            <li><a class="dropdown-item" href="{{ route('account.settings') }}"><i class="bi bi-gear me-2"></i>{{ __('Settings') }}</a></li>
-                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf

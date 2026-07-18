@@ -68,7 +68,55 @@ class LexiconSentimentService
         ];
     }
 
-    private function analyzeText($text)
+    public function analyzeCountrySentiment($countryId)
+    {
+        $newsItems = NewsCache::where('country_id', $countryId)->get();
+
+        if ($newsItems->isEmpty()) {
+            return [
+                'positive_pct' => 0,
+                'neutral_pct' => 100,
+                'negative_pct' => 0,
+                'overall_sentiment' => 'NEUTRAL',
+            ];
+        }
+
+        $totalPositive = 0;
+        $totalNegative = 0;
+        $totalNeutral = 0;
+
+        foreach ($newsItems as $news) {
+            $sentiment = $this->analyzeText($news->title . ' ' . $news->summary);
+            if ($sentiment === 'Positive') {
+                $totalPositive++;
+            } elseif ($sentiment === 'Negative') {
+                $totalNegative++;
+            } else {
+                $totalNeutral++;
+            }
+        }
+
+        $totalNews = $newsItems->count();
+        $posPct = round(($totalPositive / $totalNews) * 100);
+        $negPct = round(($totalNegative / $totalNews) * 100);
+        $neuPct = 100 - ($posPct + $negPct);
+
+        $overall = 'NEUTRAL';
+        if ($posPct > $negPct && $posPct > 40) {
+            $overall = 'POSITIVE';
+        } elseif ($negPct > $posPct && $negPct > 30) {
+            $overall = 'NEGATIVE';
+        }
+
+        return [
+            'positive_pct' => $posPct,
+            'neutral_pct' => $neuPct,
+            'negative_pct' => $negPct,
+            'overall_sentiment' => $overall,
+        ];
+    }
+
+    public function analyzeText($text)
     {
         // Lowercase
         $text = strtolower($text);

@@ -24,9 +24,6 @@ class RegisterController extends Controller
     {
         $user = $this->authService->register($request->validated());
 
-        if ($user->role === 'admin') {
-            return redirect('/admin/dashboard');
-        }
-        return redirect('/user/dashboard');
+        return redirect('/login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
 }

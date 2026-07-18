@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container d-flex justify-content-center">
-    <div class="auth-container w-100">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">Login</div>
-            <div class="card-body">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="w-100" style="max-width: 450px;">
+        <div class="card shadow border-0 rounded-4 overflow-hidden">
+            <div class="card-header text-white py-3 fs-5 fw-bold d-flex justify-content-center align-items-center" style="background-color: var(--primary-navy); border-bottom: none;">Login</div>
+            <div class="card-body p-4">
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
                     
@@ -21,14 +21,13 @@
                         @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="remember">Remember Me</label>
+                    <div class="d-grid gap-2 mt-4 mb-2">
+                        <button type="submit" class="btn text-white py-2 fw-bold" style="background-color: var(--primary-navy); border-radius: 8px;">Login</button>
                     </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('password.request') }}">Forgot Your Password?</a>
-                        <button type="submit" class="btn btn-primary">Login</button>
+                    
+                    <div class="text-center mt-3">
+                        <span class="text-muted" style="font-size: 0.9rem;">Belum punya akun?</span> 
+                        <a href="{{ route('register') }}" class="text-decoration-none fw-bold" style="color: var(--primary-navy); font-size: 0.9rem;">Registrasi sekarang</a>
                     </div>
                 </form>
             </div>

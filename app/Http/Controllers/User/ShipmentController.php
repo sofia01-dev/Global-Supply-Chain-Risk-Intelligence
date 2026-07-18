@@ -39,7 +39,7 @@ class ShipmentController extends Controller
         return view('user.shipments.index', compact('shipments', 'filters', 'countries'));
     }
 
-    public function show($id)
+    public function show($id, \Illuminate\Http\Request $request)
     {
         $shipment = $this->shipmentService->getByIdForUser($id);
         
@@ -48,30 +48,29 @@ class ShipmentController extends Controller
         // Single Source of Truth Monitoring Object
         $monitorObj = $this->monitoringService->monitor($shipment);
         
-        // Retain backward compatibility structures for Blade views
-        $legacyMonitoringData = $this->monitoringService->calculateMonitoring($shipment);
-        $monitoringData = array_merge($legacyMonitoringData, $monitorObj);
+        // Check if AJAX request for auto-refresh
+        if ($request->ajax()) {
+            return response()->json([
+                'monitorObj' => $monitorObj
+            ]);
+        }
         
-        $dynamicData = [
-            'risk_info' => [
-                'score' => $monitorObj['risk_score'],
-                'level' => $monitorObj['risk_level'],
-            ],
-            'recommendations' => [$monitorObj['recommendation']]
-        ];
-
-        return view('user.shipments.show', compact('shipment', 'mapData', 'monitoringData', 'dynamicData', 'monitorObj'));
+        return view('user.shipments.show', compact('shipment', 'mapData', 'monitorObj'));
     }
 
     public function create()
     {
+        $countries = \App\Models\Country::orderBy('name')->get();
+        // Fallback for non-ajax loading
         $ports = \App\Models\Port::with('country')->get();
-        return view('user.shipments.create', compact('ports'));
+        return view('user.shipments.create', compact('ports', 'countries'));
     }
 
     public function store(\Illuminate\Http\Request $request)
     {
         $data = $request->validate([
+            'shipment_name' => 'required|string|max:255',
+            'goods' => 'required|string|max:255',
             'origin_port_id' => 'required|exists:ports,id',
             'destination_port_id' => 'required|exists:ports,id|different:origin_port_id',
             'departure_date' => 'nullable|date',
@@ -87,8 +86,10 @@ class ShipmentController extends Controller
     public function edit($id)
     {
         $shipment = $this->shipmentService->getByIdForUser($id);
+        $countries = \App\Models\Country::orderBy('name')->get();
+        // Fallback for non-ajax loading, load all ports
         $ports = \App\Models\Port::with('country')->get();
-        return view('user.shipments.edit', compact('shipment', 'ports'));
+        return view('user.shipments.edit', compact('shipment', 'ports', 'countries'));
     }
 
     public function update(\Illuminate\Http\Request $request, $id)
@@ -110,5 +111,11 @@ class ShipmentController extends Controller
     {
         $this->shipmentService->deleteShipment($id);
         return redirect()->route('user.shipments.index')->with('success', 'Shipment deleted successfully.');
+    }
+
+    public function getPortsByCountry($country_id)
+    {
+        $ports = \App\Models\Port::where('country_id', $country_id)->orderBy('name')->get();
+        return response()->json($ports);
     }
 }

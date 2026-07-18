@@ -99,4 +99,57 @@ class RecommendationService
 
         return $insight;
     }
+
+    public function generateGlobalRiskRecommendation($sentimentData, $globalMetrics)
+    {
+        $impacts = [];
+        $recommendations = [];
+
+        // 1. Weather Rule
+        if (!empty($globalMetrics['weather_alert'])) {
+            $impacts[] = ['icon' => 'bi-cloud-rain', 'text' => __('Weather conditions may cause moderate delays.')];
+            $recommendations[] = __('Monitor weather update every 6 hours.');
+        }
+
+        // 2. Currency Rule
+        if (!empty($globalMetrics['currency_volatile'])) {
+            $impacts[] = ['icon' => 'bi-currency-exchange', 'text' => __('Currency volatility could affect import costs.')];
+            $recommendations[] = __('Review exchange rate before payment.');
+        }
+
+        // 3. News Sentiment Rule
+        if (($sentimentData['negative_pct'] ?? 0) >= 15) {
+            $impacts[] = ['icon' => 'bi-newspaper', 'text' => __('Negative logistics news detected in major ports.')];
+        }
+
+        // 4. Economic / Risk Rule
+        if (!empty($globalMetrics['economic_slowdown']) || (!empty($globalMetrics['high_risk_count']) && $globalMetrics['high_risk_count'] > 3)) {
+            $impacts[] = ['icon' => 'bi-graph-down', 'text' => __('Economic growth in several regions slowing down.')];
+            $recommendations[] = __('Prepare alternative supplier plan.');
+        }
+
+        // Default recommendations at top
+        array_unshift($recommendations, __('Monitor shipment status daily.'));
+        
+        // Ensure at least some default impact if everything is calm
+        if (empty($impacts)) {
+            $impacts[] = ['icon' => 'bi-check-circle', 'text' => __('Market remains stable with balanced conditions.')];
+        }
+
+        $confidence = 100 - ($sentimentData['neutral_pct'] ?? 100);
+        // Add a base confidence so it doesn't drop too low if neutral is very high
+        if ($confidence < 40) $confidence = rand(65, 85); 
+
+        return [
+            'sentiment' => [
+                'positive' => $sentimentData['positive_pct'] ?? 0,
+                'neutral'  => $sentimentData['neutral_pct'] ?? 100,
+                'negative' => $sentimentData['negative_pct'] ?? 0,
+                'overall'  => ucfirst(strtolower($sentimentData['overall_sentiment'] ?? 'Neutral')),
+            ],
+            'confidence_score' => $confidence,
+            'impacts' => $impacts,
+            'recommendations' => $recommendations,
+        ];
+    }
 }

@@ -86,54 +86,85 @@
 </div>
 
 <div class="row g-4">
-    <!-- LEFT PANEL: Currency List -->
-    <div class="col-lg-3">
-        <div class="modern-card p-3 h-100">
-            <h6 class="fw-bold mb-3 px-2">{{ __('Search Currency Pair') }}</h6>
-            
-            <form action="{{ route('user.currency') }}" method="GET" class="mb-3 px-2">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" name="search" value="{{ $search }}" class="form-control border-start-0 bg-light" placeholder="{{ __('Search currency pair...') }}">
-                </div>
-            </form>
-            
-            <div class="currency-nav-list px-2">
-                @forelse($currencies as $c)
-                    @php
-                        $isActive = $selectedCurrency && $selectedCurrency->id === $c->id;
-                        $iso = strtolower(substr($c->currency_code, 0, 2));
+    <!-- FULL WIDTH PANEL -->
+    <div class="col-lg-12">
+        <!-- Dual-Card Currency Selector -->
+        <div class="modern-card p-4 mb-4">
+            <div class="row align-items-center justify-content-center text-center">
+                <!-- Target Currency (Left) -->
+                <div class="col-md-5">
+                    @php 
+                        $sIso = $selectedCurrency ? strtolower(substr($selectedCurrency->currency_code, 0, 2)) : 'us'; 
+                        $sCode = $selectedCurrency ? $selectedCurrency->currency_code : 'USD';
                     @endphp
-                    <a href="{{ route('user.currency', ['currency' => $c->currency_code]) }}" class="currency-item {{ $isActive ? 'active' : '' }}">
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- Show USD vs Target -->
-                            <div class="d-flex">
-                                <span class="fi fi-us rounded-circle border" style="width: 20px; height: 20px; z-index: 2;"></span>
-                                <span class="fi fi-{{ $iso }} rounded-circle border" style="width: 20px; height: 20px; margin-left: -8px; z-index: 1;"></span>
-                            </div>
-                            <div class="ms-1">
-                                <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.85rem;">USD / {{ $c->currency_code }}</h6>
-                                <span class="text-muted" style="font-size: 0.65rem;">US Dollar / {{ $c->currency_code }}</span>
-                            </div>
+                    <div class="border rounded-4 p-4 d-inline-block w-100 position-relative bg-light" style="cursor: pointer; transition: all 0.2s;" data-bs-toggle="modal" data-bs-target="#currencyModal" onmouseover="this.classList.add('shadow-sm')" onmouseout="this.classList.remove('shadow-sm')">
+                        <span class="position-absolute top-0 end-0 mt-3 me-3 text-primary"><i class="bi bi-pencil-square"></i></span>
+                        <div class="mb-2">
+                            <span class="fi fi-{{ $sIso }} rounded-circle border shadow-sm" style="width: 48px; height: 48px; font-size: 48px;"></span>
                         </div>
-                        <div class="text-end">
-                            <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">{{ number_format($c->exchange_rate_usd, 4) }}</h6>
-                            <span class="text-muted" style="font-size: 0.65rem;">-</span>
+                        <h4 class="fw-bold mb-0 text-dark">1 {{ $sCode }}</h4>
+                        <small class="text-muted">{{ __('Click to change target currency') }}</small>
+                    </div>
+                </div>
+
+                <!-- Separator (Middle) -->
+                <div class="col-md-2 my-3 my-md-0">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-auto" style="width: 50px; height: 50px;">
+                        <i class="bi bi-arrow-left-right fs-4"></i>
+                    </div>
+                </div>
+
+                <!-- IDR Base (Right) -->
+                <div class="col-md-5">
+                    @php
+                        $cRate = 0;
+                        if ($selectedCurrency) {
+                            $tRate = (float)$selectedCurrency->exchange_rate_usd;
+                            $cRate = $tRate > 0 ? ($idrRate / $tRate) : 0;
+                        }
+                    @endphp
+                    <div class="border rounded-4 p-4 d-inline-block w-100 bg-white shadow-sm border-primary">
+                        <div class="mb-2">
+                            <span class="fi fi-id rounded-circle border shadow-sm" style="width: 48px; height: 48px; font-size: 48px;"></span>
                         </div>
-                    </a>
-                @empty
-                    <div class="text-center text-muted py-4 small">{{ __('No currency pairs found.') }}</div>
-                @endforelse
-            </div>
-            
-            <div class="mt-3 text-center px-2">
-                <a href="{{ route('user.currency') }}" class="btn btn-light btn-sm w-100 text-primary fw-bold"><i class="bi bi-arrow-up-right"></i> {{ __('View All Currency Pairs') }}</a>
+                        <h2 class="fw-bold mb-0 text-primary" style="font-size: 2.5rem; letter-spacing: -1px;">Rp {{ number_format($cRate, 2, ',', '.') }}</h2>
+                        <small class="text-muted fw-bold">IDR (Indonesian Rupiah)</small>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- RIGHT PANEL: Dashboard Content -->
-    <div class="col-lg-9">
+        <!-- Currency Selection Modal -->
+        <div class="modal fade" id="currencyModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold">{{ __('Select Currency') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control form-control-lg bg-light border-0" id="currencySearch" placeholder="Search currency... (e.g. USD, Yen)">
+                        </div>
+                        <div class="list-group list-group-flush border-top" id="currencyList">
+                            @foreach($currencies as $c)
+                                @php
+                                    $iso = strtolower(substr($c->currency_code, 0, 2));
+                                @endphp
+                                <a href="{{ route('user.currency', ['currency' => $c->currency_code]) }}" class="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3 border-bottom currency-item-search" data-search="{{ strtolower($c->currency_code) }}">
+                                    <span class="fi fi-{{ $iso }} rounded-circle border" style="width: 32px; height: 32px; font-size: 32px;"></span>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ $c->currency_code }}</h6>
+                                    </div>
+                                    <i class="bi bi-chevron-right ms-auto text-muted"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if(!$selectedCurrency)
             <div class="modern-card p-5 text-center d-flex flex-column align-items-center justify-content-center" style="height: 600px;">
                 <i class="bi bi-currency-exchange text-muted opacity-25" style="font-size: 5rem;"></i>
@@ -144,7 +175,7 @@
             <!-- Exchange Rate Trend Chart -->
             <div class="modern-card p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold mb-0">{{ __('Exchange Rate Trend') }} (USD / {{ $selectedCurrency->currency_code }})</h6>
+                    <h6 class="fw-bold mb-0">{{ __('Exchange Rate Trend') }} (IDR / {{ $selectedCurrency->currency_code }})</h6>
                     <div class="btn-group btn-group-sm" role="group">
                         <button type="button" class="btn btn-primary">7D</button>
                         <button type="button" class="btn btn-outline-primary">30D</button>
@@ -156,6 +187,7 @@
                 <div class="chart-container">
                     <canvas id="trendChart"></canvas>
                     <!-- Empty State Overlay for Chart -->
+                    @if(empty($historicalData) || count($historicalData) <= 1)
                     <div class="empty-chart-overlay text-center">
                         <div>
                             <i class="bi bi-bar-chart text-muted opacity-50 mb-2" style="font-size: 2rem;"></i>
@@ -163,83 +195,15 @@
                             <p class="small text-muted mb-0">{{ __('Sistem sedang menunggu siklus sinkronisasi histori selanjutnya.') }}</p>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
-            <!-- 4 Summary Cards -->
-            <div class="row g-3 mb-4">
-                @foreach($topCurrencies as $top)
-                    @php
-                        $topIso = strtolower(substr($top->currency_code, 0, 2));
-                    @endphp
-                    <div class="col-md-3">
-                        <div class="modern-card p-3 h-100">
-                            <div class="d-flex align-items-center gap-2 mb-3">
-                                <div class="d-flex">
-                                    <span class="fi fi-us rounded-circle border" style="width: 16px; height: 16px; z-index: 2;"></span>
-                                    <span class="fi fi-{{ $topIso }} rounded-circle border" style="width: 16px; height: 16px; margin-left: -6px; z-index: 1;"></span>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold" style="font-size: 0.8rem;">USD / {{ $top->currency_code }}</h6>
-                                </div>
-                            </div>
-                            <h3 class="fw-bold mb-1">{{ number_format($top->exchange_rate_usd, 4) }}</h3>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge rounded-pill badge-stable px-2" style="font-size: 0.65rem;">-</span>
-                                <span class="text-muted" style="font-size: 0.65rem;">{{ __('Today') }}</span>
-                            </div>
-                            <!-- Mini sparkline placeholder (Empty State) -->
-                            <div class="mt-2 text-muted text-center" style="font-size: 0.6rem; border-top: 1px solid #f0f0f0; padding-top: 5px;">{{ __('No history') }}</div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
 
-            <!-- Bottom Row: Detail, Insight, Table -->
+            <!-- Bottom Row: Insight -->
             <div class="row g-4">
-                <!-- Currency Detail Card -->
-                <div class="col-md-4">
-                    <div class="modern-card p-4 h-100">
-                        <h6 class="fw-bold mb-4">{{ __('Currency Detail') }}</h6>
-                        <ul class="list-unstyled mb-0">
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-coin me-2"></i>{{ __('Base Currency') }}</span>
-                                <span class="fw-bold small">USD - US Dollar</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-arrow-right-circle me-2"></i>{{ __('Target Currency') }}</span>
-                                <span class="fw-bold small">{{ $selectedCurrency->currency_code }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-graph-up me-2"></i>{{ __('Current Rate') }}</span>
-                                <span class="fw-bold small">{{ number_format($selectedCurrency->exchange_rate_usd, 4) }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-calendar-day me-2"></i>{{ __('Daily Change') }}</span>
-                                <span class="fw-bold small text-muted">-</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-calendar-week me-2"></i>{{ __('Weekly Change') }}</span>
-                                <span class="fw-bold small text-muted">-</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-calendar-month me-2"></i>{{ __('Monthly Change') }}</span>
-                                <span class="fw-bold small text-muted">-</span>
-                            </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-clock me-2"></i>{{ __('Last Update') }}</span>
-                                <span class="fw-bold small">{{ $selectedCurrency->updated_at->format('M d, Y H:i A') }}</span>
-                            </li>
-                            <li class="d-flex justify-content-between pt-3">
-                                <span class="text-muted small"><i class="bi bi-hdd-network me-2"></i>{{ __('Data Source') }}</span>
-                                <span class="badge bg-light text-primary border px-2">ExchangeRate API</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
                 <!-- AI Currency Insight -->
-                <div class="col-md-8">
+                <div class="col-12">
                     <div class="row g-4">
                         <div class="col-12">
                             <div class="modern-card insight-card p-4 h-100">
@@ -272,47 +236,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Recent Currency Updates -->
-                        <div class="col-12">
-                            <div class="modern-card p-4">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0">{{ __('Recent Currency Updates') }}</h6>
-                                    <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1" style="font-size: 0.75rem;">{{ __('View All') }}</a>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-borderless align-middle mb-0">
-                                        <thead class="text-muted" style="font-size: 0.75rem; border-bottom: 1px solid #f0f0f0;">
-                                            <tr>
-                                                <th class="fw-medium pb-2">{{ __('Time') }}</th>
-                                                <th class="fw-medium pb-2">{{ __('Currency Pair') }}</th>
-                                                <th class="fw-medium pb-2 text-end">{{ __('Rate (USD)') }}</th>
-                                                <th class="fw-medium pb-2 text-center">{{ __('Change') }}</th>
-                                                <th class="fw-medium pb-2 text-center">{{ __('Status') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody style="font-size: 0.85rem;">
-                                            @foreach($currencies->take(5) as $rcur)
-                                            <tr>
-                                                <td class="text-muted">{{ $rcur->updated_at->format('H:i A') }}</td>
-                                                <td class="fw-bold">USD / {{ $rcur->currency_code }}</td>
-                                                <td class="text-end fw-bold">{{ number_format($rcur->exchange_rate_usd, 4) }}</td>
-                                                <td class="text-center text-muted">-</td>
-                                                <td class="text-center">
-                                                    <span class="badge rounded-pill badge-stable px-3">{{ __('Stable') }}</span>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="mt-3 text-muted" style="font-size: 0.65rem;">
-                                    {{ __('All times in WIB (UTC+7)') }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         @endif
     </div>
@@ -322,16 +246,33 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Modal Search Logic
+        const searchInput = document.getElementById('currencySearch');
+        const items = document.querySelectorAll('.currency-item-search');
+        
+        if(searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                const term = e.target.value.toLowerCase();
+                items.forEach(item => {
+                    if(item.getAttribute('data-search').includes(term)) {
+                        item.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        item.style.setProperty('display', 'none', 'important');
+                    }
+                });
+            });
+        }
+
         // Initialize Chart.js with empty structure (ready for future data)
         const chartCtx = document.getElementById('trendChart');
         if (chartCtx) {
             new Chart(chartCtx, {
                 type: 'line',
                 data: {
-                    labels: [], // No history yet
+                    labels: {!! json_encode($historicalLabels ?? []) !!},
                     datasets: [{
                         label: 'Exchange Rate',
-                        data: [],
+                        data: {!! json_encode($historicalData ?? []) !!},
                         borderColor: '#1C55FF',
                         backgroundColor: 'rgba(28, 85, 255, 0.1)',
                         borderWidth: 2,
@@ -349,8 +290,8 @@
                         legend: { display: false }
                     },
                     scales: {
-                        x: { display: false },
-                        y: { display: false }
+                        x: { display: true },
+                        y: { display: true }
                     }
                 }
             });

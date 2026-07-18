@@ -21,6 +21,7 @@ class CountryController extends Controller
         
         $country = null;
         $aiRecommendation = null;
+        $isFavorited = false;
 
         if ($countries->isNotEmpty()) {
             $country = $this->countryDashboardService->getCountryDetail($countries->first()->id);
@@ -38,9 +39,12 @@ class CountryController extends Controller
                     ]
                 ];
             }
+            if (auth()->check()) {
+                $isFavorited = auth()->user()->watchlists()->where('country_id', $country->id)->exists();
+            }
         }
         
-        return view('user.country', compact('countries', 'country', 'aiRecommendation', 'search'));
+        return view('user.country', compact('countries', 'country', 'aiRecommendation', 'search', 'isFavorited'));
     }
 
     public function show($id) {
@@ -64,6 +68,11 @@ class CountryController extends Controller
             ];
         }
 
-        return view('user.country', compact('countries', 'country', 'aiRecommendation', 'search'));
+        $isFavorited = false;
+        if ($country && auth()->check()) {
+            $isFavorited = auth()->user()->watchlists()->where('country_id', $country->id)->exists();
+        }
+
+        return view('user.country', compact('countries', 'country', 'aiRecommendation', 'search', 'isFavorited'));
     }
 }

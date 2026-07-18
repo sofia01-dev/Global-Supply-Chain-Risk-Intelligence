@@ -3,7 +3,7 @@
 <div class="row mb-4">
     <div class="col d-flex justify-content-between align-items-center">
         <h2 class="mb-0 fw-bold">{{ __('My Shipments') }}</h2>
-        <a href="{{ route('user.shipments.create') }}" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm"><i class="bi bi-plus-lg me-1"></i> {{ __('Create Shipment') }}</a>
+        <a href="{{ route('user.shipments.create') }}" class="btn fw-bold px-4 rounded-pill shadow-sm text-white" style="background-color: var(--primary-navy);"><i class="bi bi-plus-lg me-1"></i> {{ __('Create Shipment') }}</a>
     </div>
 </div>
 
@@ -41,7 +41,7 @@
                     </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100" id="btnFilter">
+                    <button type="submit" class="btn w-100 fw-bold" id="btnFilter" style="background-color: #CCD4DE; color: var(--primary-navy); border: none;">
                         <span class="spinner-border spinner-border-sm d-none" id="filterSpinner" role="status" aria-hidden="true"></span>
                         <span id="filterText">{{ __('Filter') }}</span>
                     </button>
@@ -55,22 +55,30 @@
     <div class="card-body p-0" id="tableContainer">
         <div class="table-responsive">
             <table class="table table-hover align-middle text-sm mb-0">
-                <thead class="table-light text-muted" style="font-size: 0.85rem;">
+                <style>
+                    .custom-thead th {
+                        background-color: var(--primary-navy) !important;
+                        color: white !important;
+                        border-bottom: none !important;
+                    }
+                </style>
+                <thead class="custom-thead" style="font-size: 0.85rem;">
                     <tr>
-                        <th class="ps-4 py-3 border-bottom-0">{{ __('Shipment Number') }}</th>
+                        <th class="ps-4 py-3 border-bottom-0">{{ __('Shipment Code') }}</th>
+                        <th class="py-3 border-bottom-0">{{ __('Goods') }}</th>
                         <th class="py-3 border-bottom-0">{{ __('Route') }}</th>
-                        <th class="py-3 border-bottom-0">{{ __('Status') }}</th>
+                        <th class="py-3 border-bottom-0">{{ __('Current Stage') }}</th>
                         <th class="py-3 border-bottom-0">{{ __('Risk Level') }}</th>
-                        <th class="py-3 border-bottom-0">{{ __('Est. Delay') }}</th>
-                        <th class="py-3 border-bottom-0">{{ __('Recommendation') }}</th>
+                        <th class="py-3 border-bottom-0">{{ __('ETA') }}</th>
+                        <th class="py-3 border-bottom-0">{{ __('Status') }}</th>
                         <th class="py-3 border-bottom-0">{{ __('Last Updated') }}</th>
-                        <th class="pe-4 py-3 border-bottom-0 text-end">{{ __('Actions') }}</th>
+                        <th class="pe-4 py-3 border-bottom-0 text-end">{{ __('Action') }}</th>
                     </tr>
                 </thead>
                 <tbody class="border-top-0">
                     @if($shipments->isEmpty())
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="empty-state d-flex flex-column align-items-center justify-content-center text-muted">
                                     <div class="rounded-circle bg-light p-4 mb-3 d-inline-flex">
                                         <i class="bi bi-box-seam fs-1 text-secondary opacity-50"></i>
@@ -86,21 +94,23 @@
                                 $mon = $shipment->monitoring;
                                 $statusColor = $mon['current_status'] === 'Delayed' ? 'warning' : ($mon['current_status'] === 'At Risk' ? 'danger' : 'success');
                                 $levelColor = $mon['risk_level'] === 'Critical' ? 'danger' : ($mon['risk_level'] === 'High' ? 'warning' : ($mon['risk_level'] === 'Medium' ? 'info' : 'success'));
+                                $eta = $shipment->estimated_arrival ? \Carbon\Carbon::parse($shipment->estimated_arrival)->diffForHumans() : 'N/A';
                             @endphp
                             <tr>
                                 <td class="ps-4 py-3 fw-bold text-primary">{{ $shipment->shipment_code }}</td>
+                                <td class="py-3 text-dark fw-medium">{{ $shipment->goods ?? '-' }}</td>
                                 <td class="py-3">
-                                    <div class="d-flex flex-column" style="font-size:0.85rem">
-                                        <span class="fw-medium text-dark">{{ $mon['origin']['port'] }} <span class="text-muted">({{ $mon['origin']['country'] }})</span></span>
-                                        <span><i class="bi bi-arrow-down text-muted" style="font-size: 0.7rem;"></i></span>
-                                        <span class="fw-medium text-dark">{{ $mon['destination']['port'] }} <span class="text-muted">({{ $mon['destination']['country'] }})</span></span>
+                                    <div class="d-flex flex-row align-items-center gap-2" style="font-size:0.85rem">
+                                        <span class="text-dark">{{ $mon['origin']['country'] }}</span>
+                                        <i class="bi bi-arrow-right text-muted" style="font-size: 0.7rem;"></i>
+                                        <span class="text-dark">{{ $mon['destination']['country'] }}</span>
                                     </div>
                                 </td>
-                                <td class="py-3"><span class="badge bg-light-{{ $statusColor }} text-{{ $statusColor }} px-2 py-1">{{ __($mon['current_status']) }}</span></td>
+                                <td class="py-3 text-dark">{{ $mon['destination']['port'] }}</td>
                                 <td class="py-3"><span class="badge bg-{{ $levelColor }} px-2 py-1">{{ __($mon['risk_level']) }}</span></td>
-                                <td class="py-3 fw-medium text-secondary">{{ __($mon['estimated_delay']) }}</td>
-                                <td class="py-3 text-wrap" style="font-size:0.8rem; max-width:200px;">{{ __($mon['recommendation']) }}</td>
-                                <td class="py-3 text-muted" style="font-size:0.8rem">{{ \Carbon\Carbon::parse($mon['last_updated'])->diffForHumans() }}</td>
+                                <td class="py-3 text-dark">{{ $eta }}</td>
+                                <td class="py-3"><span class="badge bg-light-{{ $statusColor }} text-{{ $statusColor }} px-2 py-1">{{ __($mon['current_status']) }}</span></td>
+                                <td class="py-3 text-muted" style="font-size:0.8rem">{{ \Carbon\Carbon::parse($mon['last_updated'])->format('d M Y H:i') }}</td>
                                 <td class="pe-4 py-3 text-end">
                                     <div class="d-flex gap-1 justify-content-end">
                                         <a href="{{ route('user.shipments.show', $shipment->id) }}" class="btn btn-sm btn-light text-primary border" title="Monitor">

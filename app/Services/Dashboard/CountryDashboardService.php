@@ -32,11 +32,29 @@ class CountryDashboardService
         }
         $country->currentCurrency = $currency;
 
-        // Fetch fallback news analysis for sentiment (if we want to mimic the old sentiment_analysis shape)
-        if ($country->newsCaches && $country->newsCaches->isNotEmpty()) {
-            $newsList = $country->newsCaches;
-        } else {
-            $newsList = NewsCache::latest()->take(5)->get();
+        // Fetch specific country news
+        $newsList = $country->newsCaches()->latest()->take(5)->get();
+
+        // On-demand fetching: if no recent news (< 24h), fetch it from API
+        $needsSync = true;
+        if ($newsList->isNotEmpty()) {
+            $latestNews = $newsList->first();
+            if ($latestNews->created_at && $latestNews->created_at->diffInHours(now()) < 24) {
+                $needsSync = false;
+            }
+        }
+        
+        if ($needsSync) {
+            $newsApiService = app(\App\Services\Api\NewsApiService::class);
+            $syncedNews = $newsApiService->syncNewsForCountry($country);
+            if ($syncedNews->isNotEmpty()) {
+                $newsList = $country->newsCaches()->latest()->take(5)->get(); // refresh from DB
+            }
+        }
+
+        // Fallback to global news if API returns no country-specific results (e.g. very small country)
+        if ($newsList->isEmpty()) {
+            $newsList = NewsCache::whereNull('country_id')->latest()->take(5)->get();
         }
         
         $country->globalNewsFallback = $newsList;
@@ -50,13 +68,6 @@ class CountryDashboardService
             'delay_reasons' => ['System Automated Audit'],
             'sentiment_analysis' => ['sentiment' => 'Neutral', 'positive_pct' => 0, 'negative_pct' => 0, 'neutral_pct' => 100]
         ];
-
-        // Fetch fallback news analysis for sentiment (if we want to mimic the old sentiment_analysis shape)
-        if ($country->newsCaches->isNotEmpty()) {
-            $newsList = $country->newsCaches;
-        } else {
-            $newsList = NewsCache::whereNull('country_id')->latest()->take(5)->get();
-        }
         
         if ($newsList->isNotEmpty()) {
             $pos = $newsList->avg('positive_percentage') ?? 0;

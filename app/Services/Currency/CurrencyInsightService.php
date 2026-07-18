@@ -29,58 +29,58 @@ class CurrencyInsightService
         $code = $currency->currency_code;
         
         if ($dailyChangePercentage > 0.5) {
-            // USD strengthens significantly against target currency
+            // Target currency strengthens significantly against IDR
             return [
-                'status' => 'Bullish',
-                'summary' => __('The USD has strengthened significantly against :code today. This may increase import costs and affect supply chain expenses.', ['code' => $code]),
+                'status' => 'Bearish for IDR',
+                'summary' => __('The :code has strengthened significantly against the Indonesian Rupiah (IDR) today. This will increase import costs and inflate supply chain expenses from this region.', ['code' => $code]),
                 'impacts' => [
-                    __('Import cost likely to increase'),
-                    __('Logistics cost may rise'),
-                    __('Supplier pricing may be affected')
+                    __('Import costs will spike'),
+                    __('Cross-border logistics costs will rise'),
+                    __('Supplier pricing from this region will be more expensive')
                 ],
-                'recommendation' => __('Monitor supplier contracts and consider hedging strategies for high-risk exposure.')
+                'recommendation' => __('Monitor supplier contracts and consider hedging strategies or delaying purchases if possible.')
             ];
         } elseif ($dailyChangePercentage < -0.5) {
-            // USD weakens significantly
+            // Target currency weakens significantly against IDR
             return [
-                'status' => 'Bearish',
-                'summary' => __('The USD has weakened against :code. This could provide temporary relief on import costs but might impact export competitiveness.', ['code' => $code]),
+                'status' => 'Bullish for IDR',
+                'summary' => __('The :code has weakened significantly against the Indonesian Rupiah (IDR). This provides a highly favorable window to pay off logistics debts or secure cheap imports from this region.', ['code' => $code]),
                 'impacts' => [
-                    __('Favorable for imports'),
-                    __('Export margins may tighten'),
-                    __('Opportunities for early procurement')
+                    __('Highly favorable for imports'),
+                    __('Profit margins on procurement will widen'),
+                    __('Excellent opportunity for early procurement')
                 ],
-                'recommendation' => __('Review purchase planning and consider securing inventory at favorable rates.')
+                'recommendation' => __('Review purchase planning and strongly consider securing inventory or paying invoices today.')
             ];
         } elseif ($dailyChangePercentage > 0) {
             // Slight increase
             return [
-                'status' => 'Bullish',
-                'summary' => __('The USD shows slight strengthening against :code. Minimal immediate impact expected on the supply chain.', ['code' => $code]),
+                'status' => 'Slight Risk',
+                'summary' => __('The :code shows a slight strengthening against the IDR. Minimal immediate impact, but upward trend should be watched.', ['code' => $code]),
                 'impacts' => [
-                    __('Slight upward pressure on imports'),
-                    __('Logistics cost remains manageable'),
-                    __('Supplier pricing stable')
+                    __('Slight upward pressure on import costs'),
+                    __('Logistics costs remain manageable'),
+                    __('Supplier pricing generally stable')
                 ],
-                'recommendation' => __('Maintain current operations while monitoring currency trends closely.')
+                'recommendation' => __('Maintain current operations while monitoring currency trends closely for further spikes.')
             ];
         } elseif ($dailyChangePercentage < 0) {
             // Slight decrease
             return [
-                'status' => 'Bearish',
-                'summary' => __('The USD shows a slight dip against :code. Supply chain costs remain relatively stable.', ['code' => $code]),
+                'status' => 'Favorable',
+                'summary' => __('The :code shows a slight dip against the IDR. Supply chain costs from this region remain relatively stable and slightly cheaper.', ['code' => $code]),
                 'impacts' => [
                     __('Marginal benefit for imports'),
-                    __('Logistics cost stable'),
-                    __('Supplier pricing unchanged')
+                    __('Logistics costs stable'),
+                    __('Favorable environment for standard procurement')
                 ],
-                'recommendation' => __('No immediate action required. Continue regular financial monitoring.')
+                'recommendation' => __('No immediate drastic action required. Safe to proceed with regular financial activities.')
             ];
         } else {
             // No change or no data
             return [
                 'status' => 'Stable',
-                'summary' => __('Exchange rate for :code remains stable or historical data is pending. No significant supply chain disruptions expected from currency fluctuations.', ['code' => $code]),
+                'summary' => __('Exchange rate for :code vs IDR remains perfectly stable or historical data is pending. No significant supply chain disruptions expected from currency fluctuations.', ['code' => $code]),
                 'impacts' => [
                     __('Import cost stable'),
                     __('Logistics cost stable'),

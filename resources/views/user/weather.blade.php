@@ -45,7 +45,7 @@
     }
     
     #weatherMap {
-        height: 350px;
+        height: 480px;
         border-radius: 16px;
         z-index: 1; /* Keep map below navbar */
     }

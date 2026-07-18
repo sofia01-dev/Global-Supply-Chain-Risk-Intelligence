@@ -3,7 +3,11 @@
 @push('styles')
 <!-- Flag Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
+    .btn-custom-navy { background-color: var(--primary-navy); color: white; border: none; }
+    .btn-custom-navy:hover { background-color: #2c3e7a; color: white; }
     .country-nav-list {
         max-height: calc(100vh - 200px);
         overflow-y: auto;
@@ -164,9 +168,19 @@
                     </div>
                 </div>
                 <div>
-                    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"><i class="bi bi-star me-2"></i>{{ __('Add to Favorites') }}</button>
+                    <button id="btnFavorite" data-id="{{ $country->id }}" class="btn {{ $isFavorited ? 'btn-warning text-dark' : 'btn-custom-navy text-white' }} rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi {{ $isFavorited ? 'bi-star-fill' : 'bi-star' }} me-2" id="iconFavorite"></i>
+                        <span id="textFavorite">{{ $isFavorited ? __('Favorited') : __('Add to Favorites') }}</span>
+                    </button>
                 </div>
             </div>
+
+            <!-- Geographic Map -->
+            @if($country->latitude && $country->longitude)
+            <div class="modern-card p-2 mb-4" style="height: 350px; border-radius: 12px; overflow: hidden; position: relative;">
+                <div id="countryMap" style="width: 100%; height: 100%; border-radius: 8px; z-index: 1;"></div>
+            </div>
+            @endif
 
             @php
                 $eco = $country->economicIndicator;
@@ -337,8 +351,12 @@
                                     $nColor = $nSent === 'Positive' ? 'success' : ($nSent === 'Negative' ? 'danger' : 'warning');
                                 @endphp
                                 <div class="news-item d-flex gap-3 align-items-center">
-                                    <div class="bg-light rounded" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="bi bi-newspaper text-muted fs-3"></i>
+                                    <div class="bg-light rounded overflow-hidden" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        @if($news->image_url)
+                                            <img src="{{ $news->image_url }}" alt="News" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <i class="bi bi-newspaper text-muted fs-3"></i>
+                                        @endif
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">{{ $news->title }}</h6>
@@ -404,6 +422,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Live Search functionality
@@ -486,6 +505,79 @@
                 }
             });
         }
+
+        // Handle Favorite Toggle
+        const btnFavorite = document.getElementById('btnFavorite');
+        if (btnFavorite) {
+            btnFavorite.addEventListener('click', function() {
+                const countryId = this.getAttribute('data-id');
+                const btn = this;
+                const icon = document.getElementById('iconFavorite');
+                const text = document.getElementById('textFavorite');
+                
+                btn.disabled = true;
+
+                fetch('{{ route("user.watchlist.toggle") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ country_id: countryId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'added') {
+                        btn.classList.remove('btn-custom-navy', 'text-white');
+                        btn.classList.add('btn-warning', 'text-dark');
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                        text.innerText = '{{ __("Favorited") }}';
+                    } else if (data.status === 'removed') {
+                        btn.classList.remove('btn-warning', 'text-dark');
+                        btn.classList.add('btn-custom-navy', 'text-white');
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                        text.innerText = '{{ __("Add to Favorites") }}';
+                    }
+                })
+                .catch(error => console.error('Error:', error))
+                .finally(() => {
+                    btn.disabled = false;
+                });
+            });
+        }
+
+        // Initialize Map if coordinates exist
+        @if($country && $country->latitude && $country->longitude)
+        const mapContainer = document.getElementById('countryMap');
+        if (mapContainer) {
+            const lat = {{ $country->latitude }};
+            const lng = {{ $country->longitude }};
+            const countryName = '{{ $country->name }}';
+
+            const map = L.map('countryMap', {
+                zoomControl: false // Cleaner look
+            }).setView([20, 0], 2); // Initial global view
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            const marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(`<b style="font-size: 14px;">${countryName}</b>`).openPopup();
+
+            // Animate flyTo with a slight delay for dramatic effect
+            setTimeout(() => {
+                map.flyTo([lat, lng], 5, {
+                    animate: true,
+                    duration: 2.5 // 2.5 seconds flight
+                });
+            }, 500);
+        }
+        @endif
     });
 </script>
 @endpush

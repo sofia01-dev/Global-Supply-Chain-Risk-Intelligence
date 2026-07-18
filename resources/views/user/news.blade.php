@@ -11,11 +11,7 @@
             <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ __('Global news analysis for Logistics, Trade, Shipping, and Economy') }}</p>
         </div>
         <div class="d-flex gap-2">
-            <span class="badge bg-light text-dark border p-2 d-flex align-items-center gap-2">
-                <i class="bi bi-robot text-primary fs-5"></i> 
-                <span>{{ __('AI Lexicon Sentiment Engine Active') }}</span>
-            </span>
-            <button class="btn btn-primary px-4 shadow-sm rounded-3" id="syncNewsBtn">
+            <button class="btn px-4 shadow-sm rounded-3 text-white fw-bold" id="syncNewsBtn" style="background-color: var(--primary-navy); border: none;">
                 <i class="bi bi-arrow-repeat me-2"></i>{{ __('Sync News') }}
             </button>
         </div>
@@ -42,7 +38,7 @@
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
                     <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: rgba(111, 66, 193, 0.1); color: #6f42c1;">
-                        <i class="bi bi-ship fs-4"></i>
+                        <i class="bi bi-box-seam fs-4"></i>
                     </div>
                     <div>
                         <p class="text-muted small mb-0 fw-semibold">{{ __('Shipping') }}</p>
@@ -56,7 +52,7 @@
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
                     <div class="rounded-3 bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success" style="width: 48px; height: 48px;">
-                        <i class="bi bi-handshake fs-4"></i>
+                        <i class="bi bi-globe fs-4"></i>
                     </div>
                     <div>
                         <p class="text-muted small mb-0 fw-semibold">{{ __('Trade') }}</p>

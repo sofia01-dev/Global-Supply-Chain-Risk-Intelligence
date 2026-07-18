@@ -81,7 +81,36 @@ class ShipmentService
     public function updateShipment($id, $data)
     {
         $shipment = Shipment::where('user_id', Auth::id())->findOrFail($id);
+        $oldStatus = $shipment->current_status;
         $shipment->update($data);
+        
+        // Log history if status changed
+        if (isset($data['current_status']) && $oldStatus !== $data['current_status']) {
+            $locationDesc = 'Updated Location';
+            $statusLabel = 'Status Update';
+            
+            if ($data['current_status'] === 'transit') {
+                $statusLabel = 'Departed';
+                $locationDesc = $shipment->originPort ? $shipment->originPort->name : 'Origin Port';
+            } elseif ($data['current_status'] === 'arrived') {
+                $statusLabel = 'Arrived';
+                $locationDesc = $shipment->destinationPort ? $shipment->destinationPort->name : 'Destination Port';
+            } elseif ($data['current_status'] === 'delivered') {
+                $statusLabel = 'Delivered';
+                $locationDesc = 'Final Destination';
+            } elseif ($data['current_status'] === 'delayed') {
+                $statusLabel = 'Delayed';
+                $locationDesc = 'En Route';
+            }
+            
+            \App\Models\ShipmentHistory::create([
+                'shipment_id' => $shipment->id,
+                'status' => $statusLabel,
+                'location_desc' => $locationDesc,
+                'timestamp' => now()
+            ]);
+        }
+        
         return $shipment;
     }
 

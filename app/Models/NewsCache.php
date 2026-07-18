@@ -11,6 +11,7 @@ class NewsCache extends Model
         'country_id',
         'title',
         'url',
+        'image_url',
         'positive_percentage',
         'neutral_percentage',
         'negative_percentage',

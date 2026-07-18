@@ -21,8 +21,6 @@ class AuthService
 
         event(new Registered($user));
 
-        Auth::login($user);
-
         return $user;
     }
 
