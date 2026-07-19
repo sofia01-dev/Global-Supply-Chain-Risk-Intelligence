@@ -508,7 +508,47 @@
                 </div>
             </div>
         </div>
-    </div></div>
+    </div>
+
+    @if(isset($adminArticles) && $adminArticles->count() > 0)
+    <!-- ROW 6: Admin Articles / Expert Analysis -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-12">
+            <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>{{ __('Expert Analysis & Reports') }}</h6>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="row g-4">
+                        @foreach($adminArticles as $article)
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                @if($article->image)
+                                <img src="{{ $article->image }}" class="card-img-top" alt="{{ $article->title }}" style="height: 140px; object-fit: cover;">
+                                @else
+                                <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 140px;">
+                                    <i class="bi bi-file-earmark-text text-primary fs-1"></i>
+                                </div>
+                                @endif
+                                <div class="card-body p-3 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-light text-primary" style="font-size: 0.7rem;">{{ $article->category ?? 'Analysis' }}</span>
+                                        <span class="text-muted" style="font-size: 0.7rem;">{{ $article->created_at->format('M d, Y') }}</span>
+                                    </div>
+                                    <h6 class="card-title fw-bold text-dark mb-2" style="font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $article->title }}</h6>
+                                    <p class="card-text text-muted small mt-auto" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem;">
+                                        {{ strip_tags($article->content) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
 @endsection
 
@@ -587,7 +627,7 @@ function initMap() {
     const mapEl = document.getElementById('worldMap');
     if(!mapEl) return;
     map = L.map('worldMap', { zoomControl: false }).setView([20, 0], 2);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
     L.control.zoom({ position: 'topleft' }).addTo(map);

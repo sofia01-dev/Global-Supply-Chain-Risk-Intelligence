@@ -17,7 +17,7 @@ class ShipmentApiController extends Controller
 
     public function index()
     {
-        $shipments = Shipment::with(['originPort.country', 'destinationPort.country', 'histories', 'routes'])->get();
+        $shipments = Shipment::with(['originPort.country', 'destinationPort.country', 'histories'])->get();
         
         $data = $shipments->map(function ($shipment) {
             return $this->monitoringService->monitor($shipment);
@@ -32,7 +32,7 @@ class ShipmentApiController extends Controller
 
     public function show($id)
     {
-        $shipment = Shipment::with(['originPort.country', 'destinationPort.country', 'histories', 'routes'])->find($id);
+        $shipment = Shipment::with(['originPort.country', 'destinationPort.country', 'histories'])->find($id);
 
         if (!$shipment) {
             return response()->json([

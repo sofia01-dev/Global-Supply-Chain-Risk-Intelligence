@@ -93,7 +93,7 @@
                         </div>
                         <div class="d-flex gap-3">
                             <a href="{{ route('user.shipments.index') }}" class="btn btn-light px-4 py-2 rounded-3 fw-medium">{{ __('Cancel') }}</a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 fw-bold shadow-sm">
+                            <button type="submit" class="btn text-white px-5 py-2 rounded-3 fw-bold shadow-sm" style="background-color: var(--primary-navy);">
                                 {{ __('Create Shipment') }}
                             </button>
                         </div>

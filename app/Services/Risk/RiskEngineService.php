@@ -93,8 +93,20 @@ class RiskEngineService
                     $newsRisk = 50; // Fallback
                 }
 
-                // Combine Overall Risk Score
-                $finalScore = ($weatherRisk * 0.30) + ($inflationRisk * 0.25) + ($currencyRisk * 0.20) + ($newsRisk * 0.25);
+                // Fetch weights from database to match the Task Requirement perfectly
+                $factors = \App\Models\RiskFactor::pluck('weight', 'factor')->toArray();
+                
+                $weightWeather = ($factors['Weather'] ?? 30) / 100;
+                $weightInflation = ($factors['Inflation'] ?? 20) / 100;
+                $weightNews = ($factors['Political News'] ?? 40) / 100;
+                $weightCurrency = ($factors['Currency'] ?? 10) / 100;
+
+                // Combine Overall Risk Score using Weighted Risk Model
+                $finalScore = ($weatherRisk * $weightWeather) 
+                            + ($inflationRisk * $weightInflation) 
+                            + ($currencyRisk * $weightCurrency) 
+                            + ($newsRisk * $weightNews);
+                
                 $finalScore = max(0, min(100, $finalScore)); // Normalize 0-100
 
                 // Map to Risk Level

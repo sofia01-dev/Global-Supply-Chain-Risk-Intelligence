@@ -24,6 +24,7 @@ class WeatherApiService
         $countries = Country::whereNotNull('latitude')->whereNotNull('longitude')->get();
         $syncedData = collect();
 
+        // Sync Countries
         foreach ($countries as $country) {
             try {
                 usleep(100000); // 100ms delay for Open-Meteo rate limits
@@ -34,8 +35,6 @@ class WeatherApiService
                     'latitude' => $lat,
                     'longitude' => $lng,
                     'current' => 'temperature_2m,relative_humidity_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,weather_code',
-                    'daily' => 'sunrise,sunset',
-                    'hourly' => 'temperature_2m',
                     'timezone' => 'auto'
                 ]);
 
@@ -44,7 +43,7 @@ class WeatherApiService
                     if (is_array($data) && isset($data['current'])) {
                         $current = $data['current'];
                         $weather = WeatherCache::updateOrCreate(
-                            ['country_id' => $country->id],
+                            ['country_id' => $country->id, 'port_id' => null],
                             [
                                 'temperature' => $current['temperature_2m'] ?? null,
                                 'wind_speed' => $current['wind_speed_10m'] ?? null,
@@ -60,9 +59,53 @@ class WeatherApiService
                 }
             } catch (\Throwable $e) {
                 Log::error("WeatherApiService Error for {$country->name}: " . $e->getMessage());
-                // Continue to next country
             }
         }
+
+        // Sync Ports (Optimize: Only sync active ports used in shipments)
+        $activePortIds = \App\Models\Shipment::pluck('destination_port_id')->merge(\App\Models\Shipment::pluck('origin_port_id'))->unique();
+        $ports = \App\Models\Port::whereIn('id', $activePortIds)
+                    ->whereNotNull('latitude')
+                    ->whereNotNull('longitude')
+                    ->get();
+        
+        foreach ($ports as $port) {
+            try {
+                usleep(100000); // 100ms delay for Open-Meteo rate limits
+                $lat = $port->latitude;
+                $lng = $port->longitude;
+                
+                $response = Http::timeout(15)->retry(2, 100)->get("https://api.open-meteo.com/v1/forecast", [
+                    'latitude' => $lat,
+                    'longitude' => $lng,
+                    'current' => 'temperature_2m,relative_humidity_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,weather_code',
+                    'timezone' => 'auto'
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (is_array($data) && isset($data['current'])) {
+                        $current = $data['current'];
+                        $weather = WeatherCache::updateOrCreate(
+                            ['port_id' => $port->id, 'country_id' => null],
+                            [
+                                'temperature' => $current['temperature_2m'] ?? null,
+                                'wind_speed' => $current['wind_speed_10m'] ?? null,
+                                'condition' => $this->mapWeatherCode($current['weather_code'] ?? 0),
+                                'raw_data' => $data,
+                                'expires_at' => Carbon::now()->addHours(2),
+                            ]
+                        );
+                        $syncedData->push($weather);
+                    }
+                } else {
+                    Log::warning("Weather API failed for port {$port->name}: " . $response->status());
+                }
+            } catch (\Throwable $e) {
+                Log::error("WeatherApiService Error for {$port->name}: " . $e->getMessage());
+            }
+        }
+
         return $syncedData;
     }
 

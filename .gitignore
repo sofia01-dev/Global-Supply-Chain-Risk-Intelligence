@@ -25,15 +25,8 @@ Thumbs.db
 # Antigravity generated scripts
 populate_*.php
 # Manual testing scripts
-test_*.php
-run_*.php
 
-# Debug scripts
-alter_enum.php
-check_counts.php
-describe_risk_scores.php
-get_tables_schema.php
-get_top_bottom.php
+run_*.php
 
 # API response files
 api_response*.txt
@@ -42,5 +35,4 @@ api_response*.txt
 *.bak
 *.tmp
 
-add_translations.php
 seed_currency.php

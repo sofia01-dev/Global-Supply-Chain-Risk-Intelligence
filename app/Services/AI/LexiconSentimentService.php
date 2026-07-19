@@ -5,17 +5,14 @@ use App\Models\NewsCache;
 
 class LexiconSentimentService
 {
-    protected $positiveWords = [
-        "growth", "stable", "normal", "improve", "increase", "recover", 
-        "safe", "efficient", "success", "positive", "good", "great", 
-        "resolved", "steady", "profit"
-    ];
+    protected $positiveWords = [];
+    protected $negativeWords = [];
 
-    protected $negativeWords = [
-        "war", "storm", "delay", "strike", "blocked", "conflict", 
-        "crisis", "inflation", "accident", "risk", "bad", "loss", 
-        "decline", "crash", "danger"
-    ];
+    public function __construct()
+    {
+        $this->positiveWords = \App\Models\PositiveWord::pluck('word')->toArray();
+        $this->negativeWords = \App\Models\NegativeWord::pluck('word')->toArray();
+    }
 
     public function analyzeGlobalSentiment()
     {

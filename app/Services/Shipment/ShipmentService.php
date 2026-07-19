@@ -66,7 +66,6 @@ class ShipmentService
         return Shipment::with([
             'originPort.country',
             'destinationPort.country',
-            'routes.port',
             'histories' => function($q) { $q->orderBy('timestamp', 'desc'); }
         ])->where('user_id', Auth::id())->findOrFail($id);
     }

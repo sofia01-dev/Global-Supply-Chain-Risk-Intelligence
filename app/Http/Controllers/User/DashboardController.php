@@ -51,6 +51,7 @@ class DashboardController extends Controller
             'aiRecommendation' => $this->dashboardService->getGlobalAiRecommendation(),
             'aiRecommendationsList' => $aiRecommendationsList,
             'marketSentiment' => $this->dashboardService->getMarketSentimentSummary(),
+            'adminArticles' => \App\Models\Article::where('is_published', true)->latest()->take(4)->get(),
         ]);
     }
 

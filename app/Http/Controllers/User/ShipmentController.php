@@ -3,20 +3,17 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Services\Shipment\ShipmentService;
-use App\Services\Shipment\ShipmentRouteService;
 use App\Services\Shipment\ShipmentMonitoringService;
 
 class ShipmentController extends Controller
 {
-    protected $shipmentService, $routeService, $monitoringService, $recommendationService;
+    protected $shipmentService, $monitoringService, $recommendationService;
 
     public function __construct(
         ShipmentService $shipmentService,
-        ShipmentRouteService $routeService,
         ShipmentMonitoringService $monitoringService
     ) {
         $this->shipmentService = $shipmentService;
-        $this->routeService = $routeService;
         $this->monitoringService = $monitoringService;
     }
 
@@ -43,7 +40,13 @@ class ShipmentController extends Controller
     {
         $shipment = $this->shipmentService->getByIdForUser($id);
         
-        $mapData = $this->routeService->getMapData($shipment);
+        $mapData = [];
+        if ($shipment->originPort) {
+            $mapData[] = ['type' => 'Origin', 'name' => $shipment->originPort->name, 'lat' => $shipment->originPort->latitude, 'lng' => $shipment->originPort->longitude];
+        }
+        if ($shipment->destinationPort) {
+            $mapData[] = ['type' => 'Destination', 'name' => $shipment->destinationPort->name, 'lat' => $shipment->destinationPort->latitude, 'lng' => $shipment->destinationPort->longitude];
+        }
         
         // Single Source of Truth Monitoring Object
         $monitorObj = $this->monitoringService->monitor($shipment);

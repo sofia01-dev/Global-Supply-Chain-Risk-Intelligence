@@ -34,10 +34,7 @@ class Port extends Model
         return $this->hasMany(Shipment::class, 'destination_port_id');
     }
 
-    public function shipmentRoutes()
-    {
-        return $this->hasMany(ShipmentRoute::class);
-    }
+
 
     public function weatherCaches()
     {

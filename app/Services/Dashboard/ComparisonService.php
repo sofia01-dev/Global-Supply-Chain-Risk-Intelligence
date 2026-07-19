@@ -150,36 +150,36 @@ class ComparisonService
     {
         $overallText = "";
         if ($dataA['risk']['overall'] < $dataB['risk']['overall']) {
-            $overallText = "{$dataA['name']} currently has lower overall risk compared to {$dataB['name']}.";
+            $overallText = __(':nameA currently has lower overall risk compared to :nameB.', ['nameA' => $dataA['name'], 'nameB' => $dataB['name']]);
         } elseif ($dataA['risk']['overall'] > $dataB['risk']['overall']) {
-            $overallText = "{$dataB['name']} currently has lower overall risk compared to {$dataA['name']}.";
+            $overallText = __(':nameA currently has lower overall risk compared to :nameB.', ['nameA' => $dataB['name'], 'nameB' => $dataA['name']]);
         } else {
-            $overallText = "Both {$dataA['name']} and {$dataB['name']} share a similar overall risk profile.";
+            $overallText = __('Both :nameA and :nameB share a similar overall risk profile.', ['nameA' => $dataA['name'], 'nameB' => $dataB['name']]);
         }
 
         $insights = [];
         if ($dataA['inflation'] < $dataB['inflation']) {
-            $insights[] = "Inflation in {$dataA['name']} is more stable ({$dataA['inflation']}%) than {$dataB['name']} ({$dataB['inflation']}%).";
+            $insights[] = __('Inflation in :nameA is more stable (:infA%) than :nameB (:infB%).', ['nameA' => $dataA['name'], 'infA' => $dataA['inflation'], 'nameB' => $dataB['name'], 'infB' => $dataB['inflation']]);
         } else {
-            $insights[] = "Inflation in {$dataB['name']} is more stable ({$dataB['inflation']}%) than {$dataA['name']} ({$dataA['inflation']}%).";
+            $insights[] = __('Inflation in :nameA is more stable (:infA%) than :nameB (:infB%).', ['nameA' => $dataB['name'], 'infA' => $dataB['inflation'], 'nameB' => $dataA['name'], 'infB' => $dataA['inflation']]);
         }
 
         if ($dataA['gdp'] > $dataB['gdp']) {
-            $insights[] = "{$dataA['name']} has a larger economic size ({$dataA['gdp']}T USD) compared to {$dataB['name']}.";
+            $insights[] = __(':nameA has a larger economic size (:gdpAT USD) compared to :nameB.', ['nameA' => $dataA['name'], 'gdpA' => $dataA['gdp'], 'nameB' => $dataB['name']]);
         } else {
-            $insights[] = "{$dataB['name']} has a larger economic size ({$dataB['gdp']}T USD) compared to {$dataA['name']}.";
+            $insights[] = __(':nameA has a larger economic size (:gdpAT USD) compared to :nameB.', ['nameA' => $dataB['name'], 'gdpA' => $dataB['gdp'], 'nameB' => $dataA['name']]);
         }
 
         if ($dataA['sentiment']['negative_pct'] > $dataB['sentiment']['negative_pct']) {
-            $insights[] = "{$dataA['name']} has higher negative news sentiment ({$dataA['sentiment']['negative_pct']}%) which may indicate logistics issues.";
+            $insights[] = __(':nameA has higher negative news sentiment (:pct%) which may indicate logistics issues.', ['nameA' => $dataA['name'], 'pct' => $dataA['sentiment']['negative_pct']]);
         } elseif ($dataB['sentiment']['negative_pct'] > $dataA['sentiment']['negative_pct']) {
-            $insights[] = "{$dataB['name']} has higher negative news sentiment ({$dataB['sentiment']['negative_pct']}%) which may indicate logistics issues.";
+            $insights[] = __(':nameA has higher negative news sentiment (:pct%) which may indicate logistics issues.', ['nameA' => $dataB['name'], 'pct' => $dataB['sentiment']['negative_pct']]);
         }
 
         $safer = $dataA['risk']['overall'] < $dataB['risk']['overall'] ? $dataA['name'] : $dataB['name'];
         $riskier = $dataA['risk']['overall'] < $dataB['risk']['overall'] ? $dataB['name'] : $dataA['name'];
         
-        $recommendation = "If your supply chain involves high-value shipments, {$safer} currently offers lower operational risk. Continue monitoring {$riskier}'s logistics conditions due to their risk factors.";
+        $recommendation = __('If your supply chain involves high-value shipments, :safer currently offers lower operational risk. Continue monitoring :riskier logistics conditions due to their risk factors.', ['safer' => $safer, 'riskier' => $riskier]);
 
         return [
             'overall' => $overallText,

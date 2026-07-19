@@ -11,7 +11,6 @@ class RiskScoreHistory extends Model
 
     protected $fillable = [
         'country_id',
-        'shipment_id',
         'final_score',
         'risk_level',
         'calculated_at'
@@ -25,10 +24,5 @@ class RiskScoreHistory extends Model
     public function country()
     {
         return $this->belongsTo(Country::class);
-    }
-
-    public function shipment()
-    {
-        return $this->belongsTo(Shipment::class);
     }
 }

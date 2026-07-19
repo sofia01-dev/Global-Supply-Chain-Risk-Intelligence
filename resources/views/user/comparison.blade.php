@@ -79,7 +79,7 @@
                         <div class="bg-primary bg-opacity-10 rounded text-primary p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                             <i class="bi bi-graph-up"></i>
                         </div>
-                        <span class="fw-bold text-dark small">GDP (Nominal)</span>
+                        <span class="fw-bold text-dark small">{{ __('GDP (Nominal)') }}</span>
                         <i class="bi bi-info-circle text-muted ms-auto" style="font-size: 0.8rem;"></i>
                     </div>
                     <div class="row g-0">
@@ -103,7 +103,7 @@
                         <div class="bg-success bg-opacity-10 rounded text-success p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                             <i class="bi bi-graph-up-arrow"></i>
                         </div>
-                        <span class="fw-bold text-dark small">Inflation Rate (CPI)</span>
+                        <span class="fw-bold text-dark small">{{ __('Inflation Rate (CPI)') }}</span>
                         <i class="bi bi-info-circle text-muted ms-auto" style="font-size: 0.8rem;"></i>
                     </div>
                     <div class="row g-0">
@@ -127,7 +127,7 @@
                         <div class="bg-danger bg-opacity-10 rounded text-danger p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                             <i class="bi bi-shield-exclamation"></i>
                         </div>
-                        <span class="fw-bold text-dark small">Risk Score (Overall)</span>
+                        <span class="fw-bold text-dark small">{{ __('Risk Score (Overall)') }}</span>
                         <i class="bi bi-info-circle text-muted ms-auto" style="font-size: 0.8rem;"></i>
                     </div>
                     <div class="row g-0">
@@ -151,7 +151,7 @@
                         <div class="bg-info bg-opacity-10 rounded text-info p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                             <i class="bi bi-cloud-sun"></i>
                         </div>
-                        <span class="fw-bold text-dark small">Weather (Today)</span>
+                        <span class="fw-bold text-dark small">{{ __('Weather (Today)') }}</span>
                         <i class="bi bi-info-circle text-muted ms-auto" style="font-size: 0.8rem;"></i>
                     </div>
                     <div class="row g-0">
@@ -175,7 +175,7 @@
                         <div class="bg-purple bg-opacity-10 rounded text-purple p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; color: #6f42c1; background-color: rgba(111, 66, 193, 0.1);">
                             <i class="bi bi-currency-dollar"></i>
                         </div>
-                        <span class="fw-bold text-dark small" style="white-space: nowrap;">Currency (vs USD)</span>
+                        <span class="fw-bold text-dark small" style="white-space: nowrap;">{{ __('Currency (vs USD)') }}</span>
                         <i class="bi bi-info-circle text-muted ms-auto" style="font-size: 0.8rem;"></i>
                     </div>
                     <div class="row g-0">
@@ -211,7 +211,7 @@
                                 <table class="table table-sm table-borderless small align-middle mb-0">
                                     <thead>
                                         <tr class="text-muted border-bottom">
-                                            <th>Indicator</th>
+                                            <th>{{ __('Indicator') }}</th>
                                             <th class="text-end" id="radarNameA">A</th>
                                             <th class="text-end" id="radarNameB">B</th>
                                         </tr>
@@ -262,7 +262,7 @@
                         <table class="table table-borderless table-sm mb-0 align-middle">
                             <thead>
                                 <tr class="text-dark small border-bottom">
-                                    <th class="fw-bold py-3">Risk Factor</th>
+                                    <th class="fw-bold py-3">{{ __('Risk Factor') }}</th>
                                     <th class="text-center fw-bold py-3" id="rNameA">Country A</th>
                                     <th class="text-center fw-bold py-3" id="rNameB">Country B</th>
                                 </tr>
@@ -437,7 +437,7 @@
         charts[id] = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.map((_, i) => i === data.length - 1 ? 'Today' : (data.length - 1 - i) + ' Days Ago'),
+                labels: data.map((_, i) => i === data.length - 1 ? '{{ __('Today') }}' : (data.length - 1 - i) + ' Days Ago'),
                 datasets: [{
                     data: data,
                     borderColor: color,
@@ -650,11 +650,11 @@
                 document.getElementById('radarNameB').innerText = B.name;
 
                 const radarInsightsHtml = `
-                    <tr><td class="text-muted"><i class="bi bi-graph-up text-primary me-2"></i>GDP</td><td class="text-end fw-bold">${A.gdp}T</td><td class="text-end fw-bold">${B.gdp}T</td></tr>
-                    <tr><td class="text-muted"><i class="bi bi-percent text-success me-2"></i>Inflation</td><td class="text-end fw-bold">${A.inflation}%</td><td class="text-end fw-bold">${B.inflation}%</td></tr>
-                    <tr><td class="text-muted"><i class="bi bi-shield-exclamation text-danger me-2"></i>Risk Score</td><td class="text-end fw-bold">${A.risk.overall}</td><td class="text-end fw-bold">${B.risk.overall}</td></tr>
-                    <tr><td class="text-muted"><i class="bi bi-cloud-sun text-info me-2"></i>Temperature</td><td class="text-end fw-bold">${A.weather.temp}°C</td><td class="text-end fw-bold">${B.weather.temp}°C</td></tr>
-                    <tr><td class="text-muted"><i class="bi bi-currency-exchange text-warning me-2"></i>Currency</td><td class="text-end fw-bold">${A.currency.rate}</td><td class="text-end fw-bold">${B.currency.rate}</td></tr>
+                    <tr><td class="text-muted"><i class="bi bi-graph-up text-primary me-2"></i>{{ __('GDP') }}</td><td class="text-end fw-bold">${A.gdp}T</td><td class="text-end fw-bold">${B.gdp}T</td></tr>
+                    <tr><td class="text-muted"><i class="bi bi-percent text-success me-2"></i>{{ __('Inflation') }}</td><td class="text-end fw-bold">${A.inflation}%</td><td class="text-end fw-bold">${B.inflation}%</td></tr>
+                    <tr><td class="text-muted"><i class="bi bi-shield-exclamation text-danger me-2"></i>{{ __('Risk Score') }}</td><td class="text-end fw-bold">${A.risk.overall}</td><td class="text-end fw-bold">${B.risk.overall}</td></tr>
+                    <tr><td class="text-muted"><i class="bi bi-cloud-sun text-info me-2"></i>{{ __('Temperature') }}</td><td class="text-end fw-bold">${A.weather.temp}°C</td><td class="text-end fw-bold">${B.weather.temp}°C</td></tr>
+                    <tr><td class="text-muted"><i class="bi bi-currency-exchange text-warning me-2"></i>{{ __('Currency') }}</td><td class="text-end fw-bold">${A.currency.rate}</td><td class="text-end fw-bold">${B.currency.rate}</td></tr>
                 `;
                 
                 document.getElementById('radarSummaryTable').innerHTML = radarInsightsHtml;

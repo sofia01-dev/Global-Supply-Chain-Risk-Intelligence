@@ -1,0 +1,123 @@
+@extends('layouts.app')
+
+@push('styles')
+<style>
+    .admin-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        background-color: #fff;
+    }
+    .btn-navy {
+        background-color: #3E53A0;
+        color: white;
+        border: none;
+    }
+    .btn-navy:hover {
+        background-color: #2c3e80;
+        color: white;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #555;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #e0e0e0;
+        font-size: 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="container-fluid py-4" style="max-width: 800px;">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1 fw-bold text-dark">{{ __('Edit User') }}</h4>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Update account details for {{ $user->name }}</p>
+        </div>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-light border" style="border-radius: 8px; font-size: 0.85rem;">
+            <i class="bi bi-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="admin-card card p-4">
+        @if($errors->any())
+            <div class="alert alert-danger" style="border-radius: 8px;">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.users.update', $user->id) }}">
+            @csrf
+            @method('PUT')
+            
+            <h6 class="fw-bold mb-4 border-bottom pb-2">Account Details</h6>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current password">
+                    <div class="form-text" style="font-size: 0.75rem;">Only fill this if you want to change the password.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Country (Origin)</label>
+                    <select name="country_id" class="form-select" required>
+                        <option value="">-- Select Country --</option>
+                        @foreach($countries as $country)
+                            <option value="{{ $country->id }}" {{ old('country_id', $user->country_id) == $country->id ? 'selected' : '' }}>
+                                {{ $country->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <h6 class="fw-bold mb-4 border-bottom pb-2">Access & Permissions</h6>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label class="form-label">System Role</label>
+                    <select name="role" class="form-select" required>
+                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User (Standard Access)</option>
+                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrator (Full Access)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Account Status</label>
+                    <select name="status" class="form-select" required>
+                        <option value="Active" {{ old('status', $user->status) == 'Active' ? 'selected' : '' }}>Active (Can Login)</option>
+                        <option value="Inactive" {{ old('status', $user->status) == 'Inactive' ? 'selected' : '' }}>Inactive (Suspended)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-light border px-4" style="border-radius: 8px;">{{ __('Cancel') }}</a>
+                <button type="submit" class="btn btn-navy px-4" style="border-radius: 8px;">
+                    <i class="bi bi-save me-1"></i>{{ __('Save Changes') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection

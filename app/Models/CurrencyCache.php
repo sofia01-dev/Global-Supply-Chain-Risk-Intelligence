@@ -9,13 +9,11 @@ class CurrencyCache extends Model
     protected $fillable = [
         'currency_code',
         'exchange_rate_usd',
-        'raw_data',
         'expires_at',
     ];
 
     protected $casts = [
         'exchange_rate_usd' => 'decimal:6',
-        'raw_data' => 'array',
         'expires_at' => 'datetime',
     ];
 }

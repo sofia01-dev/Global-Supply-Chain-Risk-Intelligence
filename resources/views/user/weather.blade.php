@@ -191,16 +191,15 @@
                 </div>
                 <div class="col-md-3">
                     <div class="modern-card p-4 text-center h-100">
-                        <div class="text-muted fw-bold small mb-3">{{ __('Visibility') }}</div>
+                        <div class="text-muted fw-bold small mb-3">{{ __('Weather Condition') }}</div>
                         <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                            <i class="bi bi-eye text-info fs-3"></i>
-                            <h2 class="fw-bold mb-0">
-                                @if(isset($current['visibility']))
-                                    {{ round($current['visibility'] / 1000) }} <span class="fs-6">km</span>
-                                @else
-                                    -
-                                @endif
-                            </h2>
+                            @php
+                                $condText = $wea ? $wea->condition : 'Unknown';
+                                $lowerCond = strtolower($condText);
+                                $condIcon = str_contains($lowerCond, 'rain') ? 'bi-cloud-rain-fill text-primary' : (str_contains($lowerCond, 'storm') || str_contains($lowerCond, 'thunder') ? 'bi-cloud-lightning-fill text-danger' : (str_contains($lowerCond, 'cloud') ? 'bi-cloud-fill text-secondary' : 'bi-sun-fill text-warning'));
+                            @endphp
+                            <i class="bi {{ $condIcon }} fs-3"></i>
+                            <h3 class="fw-bold mb-0" style="font-size: 1.25rem;">{{ __($condText) }}</h3>
                         </div>
                     </div>
                 </div>
@@ -316,21 +315,29 @@
         if (mapElement && typeof L !== 'undefined') {
             const lat = {{ $country->latitude }};
             const lng = {{ $country->longitude }};
-            const map = L.map('weatherMap').setView([lat, lng], 5);
+            const map = L.map('weatherMap').setView([20, 0], 2);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
+
+            setTimeout(() => {
+                map.flyTo([lat, lng], 5, {
+                    duration: 2.0,
+                    easeLinearity: 0.25
+                });
+            }, 400);
 
             // Custom Marker based on condition
             @php
                 $cond = strtolower($wea->condition ?? '');
                 $markerColor = str_contains($cond, 'rain') ? '#1C55FF' : (str_contains($cond, 'storm') || str_contains($cond, 'thunder') ? '#dc3545' : (str_contains($cond, 'cloud') ? '#6c757d' : '#ffc107'));
+                $iconClass = str_contains($cond, 'rain') ? 'bi-cloud-rain-fill' : (str_contains($cond, 'storm') || str_contains($cond, 'thunder') ? 'bi-cloud-lightning-fill' : (str_contains($cond, 'cloud') ? 'bi-cloud-fill' : 'bi-sun-fill'));
             @endphp
 
             const markerHtml = `
-                <div style="background-color: white; border: 2px solid ${'{{ $markerColor }}'}; border-radius: 8px; padding: 5px 10px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold; font-family: sans-serif;">
-                    ${'{{ round($wea->temperature ?? 0) }}'}°C
+                <div style="background-color: ${'{{ $markerColor }}'}; color: white; border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); font-weight: bold; font-family: sans-serif;">
+                    <i class="bi ${'{{ $iconClass }}'}"></i> ${'{{ round($wea->temperature ?? 0) }}'}°C
                 </div>
             `;
             
@@ -351,13 +358,14 @@
                         $ow = $other->weatherCaches->first(); 
                         $ocond = strtolower($ow->condition ?? '');
                         $omColor = str_contains($ocond, 'rain') ? '#1C55FF' : (str_contains($ocond, 'storm') || str_contains($ocond, 'thunder') ? '#dc3545' : (str_contains($ocond, 'cloud') ? '#6c757d' : '#ffc107'));
+                        $oIconClass = str_contains($ocond, 'rain') ? 'bi-cloud-rain-fill' : (str_contains($ocond, 'storm') || str_contains($ocond, 'thunder') ? 'bi-cloud-lightning-fill' : (str_contains($ocond, 'cloud') ? 'bi-cloud-fill' : 'bi-sun-fill'));
                     @endphp
                     L.marker([{{ $other->latitude }}, {{ $other->longitude }}], {
                         icon: L.divIcon({
-                            html: `<div style="background-color: white; border: 2px solid ${'{{ $omColor }}'}; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: bold; font-size: 10px;">${'{{ round($ow->temperature) }}'}</div>`,
+                            html: `<div title="${'{{ round($ow->temperature) }}'}°C" style="background-color: ${'{{ $omColor }}'}; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); font-size: 14px;"><i class="bi ${'{{ $oIconClass }}'}"></i></div>`,
                             className: '',
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 15]
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16]
                         })
                     }).addTo(map);
                 @endif

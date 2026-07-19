@@ -12,19 +12,11 @@ class NewsCache extends Model
         'title',
         'url',
         'image_url',
-        'positive_percentage',
-        'neutral_percentage',
-        'negative_percentage',
-        'sentiment_score',
         'sentiment_label',
         'published_at',
     ];
 
     protected $casts = [
-        'positive_percentage' => 'decimal:2',
-        'neutral_percentage' => 'decimal:2',
-        'negative_percentage' => 'decimal:2',
-        'sentiment_score' => 'decimal:2',
         'published_at' => 'datetime',
     ];
 

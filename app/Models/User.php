@@ -15,6 +15,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'last_login_at',
+        'country_id',
     ];
 
     protected $hidden = [
@@ -27,7 +30,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
         ];
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function shipments()

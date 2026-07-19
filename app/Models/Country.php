@@ -9,21 +9,14 @@ class Country extends Model
     protected $fillable = [
         'iso2_code',
         'name',
-        'flag_url',
         'capital',
         'region',
-        'gdp',
-        'inflation_rate',
-        'population',
         'currency_code',
         'latitude',
         'longitude',
     ];
 
     protected $casts = [
-        'gdp' => 'decimal:2',
-        'inflation_rate' => 'decimal:2',
-        'population' => 'integer',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];

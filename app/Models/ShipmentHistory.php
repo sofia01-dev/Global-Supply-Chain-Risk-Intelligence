@@ -10,14 +10,10 @@ class ShipmentHistory extends Model
         'shipment_id',
         'status',
         'location_desc',
-        'latitude',
-        'longitude',
         'timestamp',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
         'timestamp' => 'datetime',
     ];
 

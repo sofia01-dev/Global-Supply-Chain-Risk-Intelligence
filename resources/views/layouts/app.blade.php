@@ -224,15 +224,14 @@
             
             <ul class="nav-sidebar">
                 @if(Auth::user()->role === 'admin')
-                    <div class="px-3 pb-2 text-uppercase" style="font-size: 0.65rem; color: #888; font-weight: 700; letter-spacing: 1px;">MAIN MENU</div>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><i class="bi bi-people"></i> User Management</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.ports.*') ? 'active' : '' }}" href="{{ route('admin.ports.index') }}"><i class="bi bi-pin-map"></i> Port Dataset</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><i class="bi bi-journal-text"></i> Analysis Articles</a></li>
+                    <div class="px-3 pb-2 text-uppercase" style="font-size: 0.65rem; color: #888; font-weight: 700; letter-spacing: 1px;">{{ __('Main Menu') }}</div>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-grid-1x2"></i> {{ __('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><i class="bi bi-people"></i> {{ __('User Management') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.ports.*') ? 'active' : '' }}" href="{{ route('admin.ports.index') }}"><i class="bi bi-pin-map"></i> {{ __('Port Dataset') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }}" href="{{ route('admin.articles.index') }}"><i class="bi bi-journal-text"></i> {{ __('Analysis Articles') }}</a></li>
                 @else
                     <div class="px-3 pb-2 text-uppercase" style="font-size: 0.65rem; color: #888; font-weight: 700; letter-spacing: 1px;">{{ __('Main Menu') }}</div>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" href="{{ route('user.dashboard') }}"><i class="bi bi-speedometer2"></i> {{ __('Dashboard') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.shipments.*') ? 'active' : '' }}" href="{{ route('user.shipments.index') }}"><i class="bi bi-box-seam"></i> {{ __('Shipment Monitoring') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.country') || request()->routeIs('user.countries.index') ? 'active' : '' }}" href="{{ route('user.countries.index') }}"><i class="bi bi-flag"></i> {{ __('Countries') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.weather') ? 'active' : '' }}" href="{{ route('user.weather') }}"><i class="bi bi-cloud-sun"></i> {{ __('Weather') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.currency') ? 'active' : '' }}" href="{{ route('user.currency') }}"><i class="bi bi-currency-exchange"></i> {{ __('Currency') }}</a></li>
@@ -240,6 +239,7 @@
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.ports.*') ? 'active' : '' }}" href="{{ route('user.ports.index') }}"><i class="bi bi-pin-map"></i> {{ __('Ports') }}</a></li>
 
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.comparison') ? 'active' : '' }}" href="{{ route('user.comparison') }}"><i class="bi bi-bar-chart-line"></i> {{ __('Country Comparison') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.shipments.*') ? 'active' : '' }}" href="{{ route('user.shipments.index') }}"><i class="bi bi-box-seam"></i> {{ __('Shipment Monitoring') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('user.watchlist.index') ? 'active' : '' }}" href="{{ route('user.watchlist.index') }}"><i class="bi bi-star"></i> {{ __('Favorite Monitoring') }}</a></li>
                 @endif
             </ul>

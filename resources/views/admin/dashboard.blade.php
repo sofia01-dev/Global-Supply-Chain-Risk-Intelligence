@@ -46,22 +46,29 @@
         border-radius: 10px;
         overflow: hidden;
     }
-    
     .admin-table th {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         color: #888;
         font-weight: 600;
         background-color: #fcfcfc;
         border-bottom: 1px solid #eee;
-        padding: 12px 15px;
+        padding: 10px 8px;
+    }
+    
+    .admin-table th:first-child, .admin-table td:first-child {
+        padding-left: 20px;
+    }
+    
+    .admin-table th:last-child, .admin-table td:last-child {
+        padding-right: 20px;
     }
     
     .admin-table td {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         vertical-align: middle;
         border-bottom: 1px solid #f9f9f9;
-        padding: 12px 15px;
+        padding: 10px 8px;
     }
     
     .badge-soft-success { background-color: #e8f5e9; color: #2e7d32; }
@@ -108,8 +115,8 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1 fw-bold text-dark">Admin Dashboard</h4>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Manage users, datasets, and analytical articles</p>
+            <h4 class="mb-1 fw-bold text-dark">{{ __('Dashboard') }}</h4>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ __('System overview and general statistics') }}</p>
         </div>
         <div class="d-flex align-items-center gap-3">
             <div class="bg-white border rounded px-3 py-2 text-muted" style="font-size: 0.85rem;">
@@ -124,9 +131,9 @@
             <div class="admin-card card p-3">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="admin-card-title">Total Users</div>
+                        <div class="admin-card-title">{{ __('Total Users') }}</div>
                         <div class="admin-card-value">{{ number_format($summary['totalUsers'] ?? 0) }}</div>
-                        <div class="admin-card-sub"><i class="bi bi-arrow-up-short"></i> {{ $summary['newUsers'] ?? 0 }} this month</div>
+                        <div class="admin-card-sub text-success"><i class="bi bi-arrow-up-short"></i> {{ $summary['newUsers'] ?? 0 }} {{ __('this month') }}</div>
                     </div>
                     <div class="admin-icon-box bg-light-primary text-primary" style="background-color: #e3f2fd; color: #1565c0;">
                         <i class="bi bi-people"></i>
@@ -138,9 +145,9 @@
             <div class="admin-card card p-3">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="admin-card-title">Total Ports</div>
+                        <div class="admin-card-title">{{ __('Total Ports') }}</div>
                         <div class="admin-card-value">{{ number_format($summary['totalPorts'] ?? 0) }}</div>
-                        <div class="admin-card-sub"><i class="bi bi-arrow-up-short"></i> {{ $summary['newPorts'] ?? 0 }} this month</div>
+                        <div class="admin-card-sub text-success"><i class="bi bi-arrow-up-short"></i> {{ $summary['newPorts'] ?? 0 }} {{ __('this month') }}</div>
                     </div>
                     <div class="admin-icon-box" style="background-color: #e8f5e9; color: #2e7d32;">
                         <i class="bi bi-buildings"></i>
@@ -196,41 +203,41 @@
     <div class="row g-3 mb-4">
         <div class="col-12">
             <div class="admin-card card p-4">
-                <h6 class="fw-bold mb-3">Quick Actions</h6>
+                <h6 class="fw-bold mb-3">{{ __('Quick Actions') }}</h6>
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <a href="{{ route('admin.users.index') }}" class="btn-quick-action">
+                        <a href="{{ route('admin.users.create') }}" class="btn-quick-action">
                             <i class="bi bi-person-plus"></i>
                             <div>
-                                <h6>Add New User</h6>
-                                <p>Create a new user account</p>
+                                <h6>{{ __('Add New User') }}</h6>
+                                <p>{{ __('Create a new user account') }}</p>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('admin.articles.index') }}" class="btn-quick-action">
+                        <a href="{{ route('admin.articles.create') }}" class="btn-quick-action">
                             <i class="bi bi-pencil-square"></i>
                             <div>
-                                <h6>Create Article</h6>
-                                <p>Write new analysis article</p>
+                                <h6>{{ __('Create Article') }}</h6>
+                                <p>{{ __('Write new analysis article') }}</p>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('admin.ports.index') }}" class="btn-quick-action">
+                        <a href="{{ route('admin.ports.create') }}" class="btn-quick-action">
                             <i class="bi bi-cloud-arrow-up"></i>
                             <div>
-                                <h6>Import Ports</h6>
-                                <p>Manage port datasets</p>
+                                <h6>{{ __('Import Ports') }}</h6>
+                                <p>{{ __('Manage port datasets') }}</p>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="#" class="btn-quick-action">
+                        <a href="#" onclick="alert('Sinkronisasi data sedang berjalan di latar belakang...'); return false;" class="btn-quick-action">
                             <i class="bi bi-arrow-repeat"></i>
                             <div>
-                                <h6>Sync All Data</h6>
-                                <p>Sync all external datasets</p>
+                                <h6>{{ __('Sync All Data') }}</h6>
+                                <p>{{ __('Sync all external datasets') }}</p>
                             </div>
                         </a>
                     </div>
@@ -244,18 +251,18 @@
         <!-- Recent Users -->
         <div class="col-lg-4">
             <div class="admin-card card p-0">
-                <div class="card-header border-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold m-0">Recent Users</h6>
-                    <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">View All Users</a>
+                <div class="card-header border-0 bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0">{{ __('Recent Users') }}</h6>
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">{{ __('View All Users') }}</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table admin-table mb-0">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Joined At</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('Email') }}</th>
+                                <th>{{ __('Role') }}</th>
+                                <th style="white-space: nowrap;">{{ __('Joined At') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -271,10 +278,10 @@
                                 </td>
                                 <td>{{ $user->email }}</td>
                                 <td><span class="badge {{ $user->role == 'admin' ? 'badge-soft-primary' : 'badge-soft-success' }} rounded-pill text-capitalize px-2 py-1">{{ $user->role }}</span></td>
-                                <td class="text-muted">{{ $user->created_at->format('d M Y') }}</td>
+                                <td class="text-muted" style="white-space: nowrap;">{{ $user->created_at->format('d M Y') }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-center py-3 text-muted">No users found.</td></tr>
+                            <tr><td colspan="4" class="text-center py-3 text-muted">{{ __('No users found.') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -285,28 +292,34 @@
         <!-- Recent Articles -->
         <div class="col-lg-4">
             <div class="admin-card card p-0">
-                <div class="card-header border-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold m-0">Recent Articles</h6>
-                    <a href="{{ route('admin.articles.index') }}" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">View All Articles</a>
+                <div class="card-header border-0 bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0">{{ __('Recent Articles') }}</h6>
+                    <a href="{{ route('admin.articles.index') }}" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">{{ __('View All Articles') }}</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table admin-table mb-0">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>Status</th>
-                                <th>Published At</th>
+                                <th>{{ __('Title') }}</th>
+                                <th>{{ __('Status') }}</th>
+                                <th>{{ __('Published At') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($summary['recentArticles'] ?? [] as $article)
                             <tr>
                                 <td><span class="text-truncate d-inline-block fw-medium" style="max-width: 150px;">{{ $article->title }}</span></td>
-                                <td><span class="badge {{ $article->status == 'Published' ? 'badge-soft-success' : 'badge-soft-warning' }} rounded-pill px-2 py-1">{{ $article->status }}</span></td>
+                                <td>
+                                    @if($article->is_published)
+                                        <span class="badge badge-soft-success rounded-pill px-2 py-1">Dipublikasikan</span>
+                                    @else
+                                        <span class="badge badge-soft-warning rounded-pill px-2 py-1">Draft</span>
+                                    @endif
+                                </td>
                                 <td class="text-muted">{{ $article->created_at->format('d M Y') }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" class="text-center py-3 text-muted">No articles found.</td></tr>
+                            <tr><td colspan="3" class="text-center py-3 text-muted">{{ __('No articles found.') }}</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -317,17 +330,17 @@
         <!-- Dataset Status -->
         <div class="col-lg-4">
             <div class="admin-card card p-0">
-                <div class="card-header border-0 bg-transparent py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold m-0">Dataset Status</h6>
-                    <a href="#" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">View All Datasets</a>
+                <div class="card-header border-0 bg-transparent py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold m-0">{{ __('Dataset Status') }}</h6>
+                    <a href="{{ route('admin.ports.index') }}" class="btn btn-sm btn-light border" style="font-size: 0.75rem;">{{ __('View All Datasets') }}</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table admin-table mb-0">
                         <thead>
                             <tr>
-                                <th>Dataset</th>
-                                <th>Records</th>
-                                <th>Status</th>
+                                <th>{{ __('Dataset') }}</th>
+                                <th>{{ __('Records') }}</th>
+                                <th>{{ __('Status') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -345,14 +358,5 @@
         </div>
     </div>
     
-    <!-- System Info Footer -->
-    <div class="row mt-4 mb-2">
-        <div class="col-12 text-center text-muted" style="font-size: 0.75rem;">
-            <span class="me-3"><strong>Laravel:</strong> {{ app()->version() }}</span>
-            <span class="me-3"><strong>PHP:</strong> {{ phpversion() }}</span>
-            <span class="me-3"><strong>Environment:</strong> {{ app()->environment() }}</span>
-            <span><strong>Timezone:</strong> {{ date_default_timezone_get() }}</span>
-        </div>
-    </div>
 </div>
 @endsection

@@ -93,7 +93,7 @@
     <a href="{{ route('user.shipments.index') }}" class="btn btn-light rounded-circle shadow-sm" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
         <i class="bi bi-arrow-left"></i>
     </a>
-    <span class="text-primary fw-medium">Shipment: {{ $shipment->shipment_code }}</span>
+    <span class="text-primary fw-medium">{{ __('Shipment:') }} {{ $shipment->shipment_code }}</span>
 </div>
 
 <!-- Header Card -->
@@ -211,7 +211,7 @@
                                 <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary me-2" style="width: 32px; height: 32px;"><i class="bi bi-graph-up"></i></div>
                                 <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ __('Economic Risk') }}</span>
                             </div>
-                            <div class="small text-dark mb-1" id="val-economic-inf" style="font-size: 0.8rem;">Inflation (ID)</div>
+                            <div class="small text-dark mb-1" id="val-economic-inf" style="font-size: 0.8rem;">{{ __('Inflation (ID)') }}</div>
                             <div class="small text-muted" id="val-economic-val" style="font-size: 0.75rem;">{{ $monitorObj['economic']['inflation'] }}</div>
                             <div class="mt-2"><span class="badge bg-light-warning text-warning border rounded-1 px-2 py-1" id="badge-economic">{{ $monitorObj['economic']['level'] }}</span></div>
                         </div>
@@ -230,21 +230,21 @@
                     <div class="risk-gauge-container mx-auto" style="height: 140px; width: 140px;">
                         <canvas id="riskGauge"></canvas>
                         <div class="risk-score-text text-dark" id="gaugeScoreText" style="font-size: 2rem;">{{ $monitorObj['risk_score'] }}</div>
-                        <div class="risk-score-label text-{{ $levelColor }} fw-bold" id="gaugeLevelText" style="font-size: 0.65rem;">{{ strtoupper($monitorObj['risk_level']) }} RISK</div>
+                        <div class="risk-score-label text-{{ $levelColor }} fw-bold" id="gaugeLevelText" style="font-size: 0.65rem;">{{ __(strtoupper($monitorObj['risk_level']) . ' RISK') }}</div>
                     </div>
                 </div>
                 
                 <div class="text-start mt-2">
-                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">Weather Impact</span><span class="fw-bold">30%</span></div>
+                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">{{ __('Weather Impact') }}</span><span class="fw-bold">30%</span></div>
                     <div class="progress mb-2 rounded-0" style="height: 3px;"><div class="progress-bar bg-danger" style="width: 30%"></div></div>
                     
-                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">News Impact</span><span class="fw-bold">40%</span></div>
+                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">{{ __('News Impact') }}</span><span class="fw-bold">40%</span></div>
                     <div class="progress mb-2 rounded-0" style="height: 3px;"><div class="progress-bar bg-danger" style="width: 40%"></div></div>
                     
-                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">Inflation Impact</span><span class="fw-bold">20%</span></div>
+                    <div class="d-flex justify-content-between small mb-1" style="font-size: 0.75rem;"><span class="text-muted">{{ __('Inflation Impact') }}</span><span class="fw-bold">20%</span></div>
                     <div class="progress mb-2 rounded-0" style="height: 3px;"><div class="progress-bar bg-warning" style="width: 20%"></div></div>
                     
-                    <div class="d-flex justify-content-between small mb-0" style="font-size: 0.75rem;"><span class="text-muted">Currency Impact</span><span class="fw-bold">10%</span></div>
+                    <div class="d-flex justify-content-between small mb-0" style="font-size: 0.75rem;"><span class="text-muted">{{ __('Currency Impact') }}</span><span class="fw-bold">10%</span></div>
                     <div class="progress mb-0 rounded-0" style="height: 3px;"><div class="progress-bar bg-warning" style="width: 10%"></div></div>
                 </div>
             </div>
@@ -293,7 +293,7 @@
                             </div>
                             <div class="small fw-bold text-dark mt-2" style="font-size: 0.8rem">{{ $step['label'] }}</div>
                             <div class="small text-muted" style="font-size: 0.7rem">{{ $step['date'] }}</div>
-                            @if(isset($step['is_current'])) <div class="badge bg-primary bg-opacity-10 text-primary mt-1 border border-primary" style="font-size:0.65rem">Current Stage</div> @endif
+                            @if(isset($step['is_current'])) <div class="badge bg-primary bg-opacity-10 text-primary mt-1 border border-primary" style="font-size:0.65rem">{{ __('Current Stage') }}</div> @endif
                         </div>
                     @endforeach
                 </div>
@@ -341,7 +341,7 @@
     
     // Init Map
     const map = L.map('shipmentMap');
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(map);
 
@@ -362,13 +362,13 @@
     };
 
     mapData.forEach(point => {
-        const pLatlng = [point.lat, point.lng];
+        const pLatlng = [parseFloat(point.lat), parseFloat(point.lng)];
         latlngs.push(pLatlng);
         bounds.extend(pLatlng);
         
         let color = '#198754'; // Green Origin
         if(point.type === 'Destination') color = '#dc3545'; // Red Dest
-        if(point.type === 'Transit') color = '#0d6efd'; // Blue Transit
+        if(point.type === 'Transit') color = '#0dcaf0'; // Cyan Transit
         
         const isCurrent = (point.name === currentLocation);
         
@@ -377,12 +377,56 @@
          .addTo(map);
     });
 
+    // Function to calculate a quadratic bezier curve for maritime routes
+    function getBezierCurve(start, end, tension = 0.2) {
+        const points = [];
+        const midLat = (start[0] + end[0]) / 2;
+        const midLng = (start[1] + end[1]) / 2;
+        
+        // Offset the midpoint to create a curve
+        const dLng = end[1] - start[1];
+        const dLat = end[0] - start[0];
+        
+        // Control point
+        const ctrlLat = midLat - (dLng * tension);
+        const ctrlLng = midLng + (dLat * tension);
+        
+        for (let i = 0; i <= 100; i++) {
+            const t = i / 100;
+            const lat = Math.pow(1 - t, 2) * start[0] + 2 * (1 - t) * t * ctrlLat + Math.pow(t, 2) * end[0];
+            const lng = Math.pow(1 - t, 2) * start[1] + 2 * (1 - t) * t * ctrlLng + Math.pow(t, 2) * end[1];
+            points.push([lat, lng]);
+        }
+        return points;
+    }
+
     if (latlngs.length > 1) {
-        L.polyline(latlngs, {
-            color: '#0d6efd',
-            weight: 3,
-            dashArray: '5, 10',
-            opacity: 0.7
+        let allCurvePoints = [];
+        for (let i = 0; i < latlngs.length - 1; i++) {
+            // Use negative tension (-0.25) to invert the curve towards the ocean (East)
+            const curve = getBezierCurve(latlngs[i], latlngs[i+1], -0.25);
+            allCurvePoints = allCurvePoints.concat(curve);
+        }
+        
+        // Add animated CSS to page
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .ship-route-path {
+                animation: dash 5s linear infinite;
+                filter: drop-shadow(0px 2px 3px rgba(13, 110, 253, 0.4));
+            }
+            @keyframes dash {
+                to { stroke-dashoffset: -100; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        L.polyline(allCurvePoints, {
+            color: '#0d6efd', // Deep blue for bright maps
+            weight: 4,
+            dashArray: '10, 15',
+            className: 'ship-route-path',
+            opacity: 0.8
         }).addTo(map);
     }
     
@@ -435,7 +479,14 @@
             // Update Texts
             document.getElementById('gaugeScoreText').innerText = mon.risk_score;
             document.getElementById('gaugeScoreText').className = `risk-score-text text-${mon.risk_level === 'Critical' ? 'danger' : 'dark'}`;
-            document.getElementById('gaugeLevelText').innerText = `${mon.risk_level.toUpperCase()} RISK`;
+            const transMap = {
+                'Critical': '{{ __('Critical') }}',
+                'High': '{{ __('High') }}',
+                'Medium': '{{ __('Medium') }}',
+                'Low': '{{ __('Low') }}',
+                'RISK': '{{ __('RISK') }}'
+            };
+            document.getElementById('gaugeLevelText').innerText = `${transMap[mon.risk_level].toUpperCase()} ${transMap['RISK']}`;
             
             // Update Risk Cards (Weather)
             document.getElementById('val-weather-rain').innerText = mon.weather.rain;

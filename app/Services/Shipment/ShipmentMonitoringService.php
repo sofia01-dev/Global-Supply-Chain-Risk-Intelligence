@@ -38,8 +38,16 @@ class ShipmentMonitoringService
         $newsPenalty = 0;
 
         if ($monitorCountry) {
-            // 1. Weather Risk (30%)
-            $weather = WeatherCache::where('country_id', $monitorCountry->id)->latest()->first();
+            // 1. Weather Risk (30%) - MICRO LEVEL (Port specific)
+            $weather = null;
+            if ($destPort) {
+                $weather = WeatherCache::where('port_id', $destPort->id)->latest()->first();
+            }
+            // Fallback to macro country weather if port weather is not synced yet
+            if (!$weather) {
+                $weather = WeatherCache::where('country_id', $monitorCountry->id)->latest()->first();
+            }
+            
             if ($weather) {
                 $temp = $weather->temperature ?? 25;
                 $wind = $weather->wind_speed ?? 0;
@@ -143,7 +151,7 @@ class ShipmentMonitoringService
         $recommendationObj = $this->generateRuleBasedRecommendation($weatherData, $newsData, $delayDays);
 
         // Calculate progress %
-        $totalStops = 2 + $shipment->routes->count(); 
+        $totalStops = 2; // Origin + Destination
         $completedStops = $histories->whereIn('status', ['Arrived', 'Departed', 'Delivered'])->count();
         $progress = $totalStops > 0 ? min(100, round(($completedStops / ($totalStops * 2)) * 100)) : 0;
 
@@ -162,7 +170,7 @@ class ShipmentMonitoringService
             'progress_percentage' => $progress,
             'risk_score' => $finalScore,
             'risk_level' => $finalLevel,
-            'estimated_delay' => $delayDays . ' Days',
+            'estimated_delay' => $delayDays . ' ' . __('Days'),
             'recommendation' => $recommendationObj['text'],
             'recommendation_bullets' => $recommendationObj['bullets'],
             'last_updated' => now()->toDateTimeString(),
@@ -199,23 +207,23 @@ class ShipmentMonitoringService
     private function generateRuleBasedRecommendation($weather, $news, $delayDays)
     {
         $bullets = [];
-        $text = "Market remains stable with balanced conditions.";
+        $text = __('Market remains stable with balanced conditions.');
         
         if ($weather['score'] > 60) {
-            $text = "Heavy rain/wind detected at destination port causing potential delays.";
-            $bullets[] = "Increase monitoring frequency";
-            $bullets[] = "Contact port authority for terminal status";
+            $text = __('Heavy rain/wind detected at destination port causing potential delays.');
+            $bullets[] = __('Increase monitoring frequency');
+            $bullets[] = __('Contact port authority for terminal status');
         } elseif ($news['score'] > 60) {
-            $text = "Negative logistics news increased in the destination region.";
-            $bullets[] = "Review alternative inland transport options";
-            $bullets[] = "Contact shipping agent immediately";
+            $text = __('Negative logistics news increased in the destination region.');
+            $bullets[] = __('Review alternative inland transport options');
+            $bullets[] = __('Contact shipping agent immediately');
         }
         
         if (empty($bullets)) {
-            $bullets[] = "Continue standard monitoring procedures";
-            $bullets[] = "Maintain current inventory levels";
+            $bullets[] = __('Continue standard monitoring procedures');
+            $bullets[] = __('Maintain current inventory levels');
         } else {
-            $bullets[] = "Prepare warehouse adjustment for {$delayDays} days delay";
+            $bullets[] = __('Prepare warehouse adjustment for :days days delay', ['days' => $delayDays]);
         }
         
         return [

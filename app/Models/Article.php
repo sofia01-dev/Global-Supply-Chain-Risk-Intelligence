@@ -10,12 +10,16 @@ class Article extends Model
         'admin_id',
         'title',
         'slug',
+        'image',
+        'category',
+        'tags',
         'content',
         'is_published',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
+        'tags' => 'array',
     ];
 
     public function admin()

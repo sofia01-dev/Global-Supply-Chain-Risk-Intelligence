@@ -27,13 +27,28 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
         
         Route::get('/admin/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/admin/users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
+        Route::post('/admin/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
         Route::get('/admin/users/{id}', [\App\Http\Controllers\Admin\UserController::class, 'show'])->name('admin.users.show');
+        Route::get('/admin/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/admin/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
+        Route::delete('/admin/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
         
         Route::get('/admin/ports', [\App\Http\Controllers\Admin\PortController::class, 'index'])->name('admin.ports.index');
+        Route::get('/admin/ports/create', [\App\Http\Controllers\Admin\PortController::class, 'create'])->name('admin.ports.create');
+        Route::post('/admin/ports', [\App\Http\Controllers\Admin\PortController::class, 'store'])->name('admin.ports.store');
         Route::get('/admin/ports/{id}', [\App\Http\Controllers\Admin\PortController::class, 'show'])->name('admin.ports.show');
+        Route::get('/admin/ports/{port}/edit', [\App\Http\Controllers\Admin\PortController::class, 'edit'])->name('admin.ports.edit');
+        Route::put('/admin/ports/{port}', [\App\Http\Controllers\Admin\PortController::class, 'update'])->name('admin.ports.update');
+        Route::delete('/admin/ports/{port}', [\App\Http\Controllers\Admin\PortController::class, 'destroy'])->name('admin.ports.destroy');
         
         Route::get('/admin/articles', [\App\Http\Controllers\Admin\ArticleController::class, 'index'])->name('admin.articles.index');
+        Route::get('/admin/articles/create', [\App\Http\Controllers\Admin\ArticleController::class, 'create'])->name('admin.articles.create');
+        Route::post('/admin/articles', [\App\Http\Controllers\Admin\ArticleController::class, 'store'])->name('admin.articles.store');
         Route::get('/admin/articles/{id}', [\App\Http\Controllers\Admin\ArticleController::class, 'show'])->name('admin.articles.show');
+        Route::get('/admin/articles/{article}/edit', [\App\Http\Controllers\Admin\ArticleController::class, 'edit'])->name('admin.articles.edit');
+        Route::put('/admin/articles/{article}', [\App\Http\Controllers\Admin\ArticleController::class, 'update'])->name('admin.articles.update');
+        Route::delete('/admin/articles/{article}', [\App\Http\Controllers\Admin\ArticleController::class, 'destroy'])->name('admin.articles.destroy');
     });
     
     Route::middleware('user')->group(function () {

@@ -14,8 +14,6 @@ class Shipment extends Model
         'origin_port_id',
         'destination_port_id',
         'current_status',
-        'delay_reason',
-        'recommendation',
         'departure_date',
         'estimated_arrival',
     ];
@@ -40,10 +38,7 @@ class Shipment extends Model
         return $this->belongsTo(Port::class, 'destination_port_id');
     }
 
-    public function routes()
-    {
-        return $this->hasMany(ShipmentRoute::class);
-    }
+
 
     public function histories()
     {
