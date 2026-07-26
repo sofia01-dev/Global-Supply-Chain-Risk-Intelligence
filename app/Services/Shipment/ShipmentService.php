@@ -57,7 +57,7 @@ class ShipmentService
             });
         }
 
-        // Order by latest and paginate
+        // Urutkan berdasarkan yang terbaru
         return $query->latest()->paginate(10);
     }
 
@@ -83,7 +83,7 @@ class ShipmentService
         $oldStatus = $shipment->current_status;
         $shipment->update($data);
         
-        // Log history if status changed
+        // Catat riwayat jika status berubah
         if (isset($data['current_status']) && $oldStatus !== $data['current_status']) {
             $locationDesc = 'Updated Location';
             $statusLabel = 'Status Update';

@@ -154,9 +154,9 @@
     "No Alert": "Tidak Ada Peringatan",
     "Weather is calm.": "Cuaca tenang.",
     "Thunderstorm": "Badai Petir",
-    "Thunderstorms possible in some areas": "Badai petir mungkin terjadi di beberapa area",
+    "Thunderstorms possible in some areas": "Badai petir mungkin terjadi di beberapa wilayah",
     "Heavy Rain Warning": "Peringatan Hujan Lebat",
-    "Heavy rainfall expected in several regions": "Hujan lebat diperkirakan di beberapa wilayah",
+    "Heavy rainfall expected in several regions": "Hujan lebat diperkirakan terjadi di beberapa wilayah",
     "Strong Wind": "Angin Kencang",
     "Strong winds up to :speed km\/h expected": "Angin kencang hingga :speed km\/h diperkirakan",
     "Weather Alerts": "Peringatan Cuaca",
@@ -627,5 +627,8 @@
     "Heavy rain\/wind detected at destination port causing potential delays.": "Hujan\/angin kencang terdeteksi di pelabuhan tujuan yang menyebabkan potensi keterlambatan.",
     "Negative logistics news increased in the destination region.": "Berita logistik negatif meningkat di wilayah tujuan.",
     "Review alternative inland transport options": "Tinjau opsi transportasi darat alternatif",
-    "Contact shipping agent immediately": "Segera hubungi agen pengiriman"
+    "Contact shipping agent immediately": "Segera hubungi agen pengiriman",
+    "Monitor global weather conditions in real-time based on the selected country.": "Pantau kondisi cuaca global secara real-time berdasarkan negara yang dipilih.",
+    "No Flood Alert": "Tidak Ada Peringatan Banjir",
+    "No flood risk in your area": "Tidak ada risiko banjir di daerah Anda"
 }

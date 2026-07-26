@@ -9,7 +9,7 @@
     .btn-custom-navy { background-color: var(--primary-navy); color: white; border: none; }
     .btn-custom-navy:hover { background-color: #2c3e7a; color: white; }
     .country-nav-list {
-        max-height: calc(100vh - 200px);
+        flex-grow: 1;
         overflow-y: auto;
         padding-right: 5px;
     }
@@ -91,47 +91,48 @@
 
 @section('content')
 <div class="row g-4">
-    <!-- LEFT PANEL: Country List -->
-    <div class="col-lg-3">
-        <div class="modern-card p-3">
-            <h6 class="fw-bold mb-3 px-2">{{ __('Select Country') }}</h6>
-            <div class="mb-3 px-2">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="{{ __('Search country...') }}">
+    <div class="col-lg-3 position-relative">
+        <div class="position-absolute" style="top: 0; bottom: 0; left: 12px; right: 12px;">
+            <div class="modern-card p-3 h-100 d-flex flex-column">
+                <h6 class="fw-bold mb-3 px-2 flex-shrink-0">{{ __('Select Country') }}</h6>
+                <div class="mb-3 px-2 flex-shrink-0">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="{{ __('Search country...') }}">
+                    </div>
                 </div>
-            </div>
-            
-            <div class="country-nav-list px-2">
-                @forelse($countries as $c)
-                    @php
-                        $cRisk = $c->riskScores->first();
-                        $cRiskLevel = $cRisk ? $cRisk->risk_level : 'Low';
-                        $cColor = $cRiskLevel === 'Critical' ? 'danger' : ($cRiskLevel === 'High' ? 'warning' : ($cRiskLevel === 'Medium' ? 'info' : 'success'));
-                        $isActive = $country && $country->id === $c->id;
-                    @endphp
-                    <a href="{{ route('user.country', $c->id) }}" class="country-item {{ $isActive ? 'active' : '' }}">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fi fi-{{ strtolower($c->iso2_code ?? 'un') }} fs-4 rounded shadow-sm"></span>
-                            <div>
-                                <h6 class="mb-0 fw-bold {{ $isActive ? 'text-primary' : 'text-dark' }}" style="font-size: 0.9rem;">{{ $c->name }}</h6>
-                                <span class="text-muted" style="font-size: 0.75rem;">{{ __($c->region ?? 'Unknown') }}</span>
+                
+                <div class="country-nav-list px-2 flex-grow-1" style="overflow-y: auto;">
+                    @forelse($countries as $c)
+                        @php
+                            $cRisk = $c->riskScores->first();
+                            $cRiskLevel = $cRisk ? $cRisk->risk_level : 'Low';
+                            $cColor = $cRiskLevel === 'Critical' ? 'danger' : ($cRiskLevel === 'High' ? 'warning' : ($cRiskLevel === 'Medium' ? 'info' : 'success'));
+                            $isActive = $country && $country->id === $c->id;
+                        @endphp
+                        <a href="{{ route('user.country', $c->id) }}" class="country-item {{ $isActive ? 'active' : '' }}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fi fi-{{ strtolower($c->iso2_code ?? 'un') }} fs-4 rounded shadow-sm"></span>
+                                <div>
+                                    <h6 class="mb-0 fw-bold {{ $isActive ? 'text-primary' : 'text-dark' }}" style="font-size: 0.9rem;">{{ $c->name }}</h6>
+                                    <span class="text-muted" style="font-size: 0.75rem;">{{ __($c->region ?? 'Unknown') }}</span>
+                                </div>
                             </div>
-                        </div>
-                        <span class="badge bg-light-{{ $cColor }} text-{{ $cColor }} rounded-pill" style="font-size: 0.7rem;">
-                            {{ __($cRiskLevel) }}
-                        </span>
-                    </a>
-                @empty
-                    <div class="text-center text-muted py-4 small">{{ __('No countries found.') }}</div>
-                @endforelse
-            </div>
-            
-            @if($countries->count() > 0)
-                <div class="mt-3 text-center px-2">
-                    <p class="text-muted small mb-0">{{ __('Showing') }} {{ $countries->count() }} {{ __('countries') }}</p>
+                            <span class="badge bg-light-{{ $cColor }} text-{{ $cColor }} rounded-pill" style="font-size: 0.7rem;">
+                                {{ __($cRiskLevel) }}
+                            </span>
+                        </a>
+                    @empty
+                        <div class="text-center text-muted py-4 small">{{ __('No countries found.') }}</div>
+                    @endforelse
                 </div>
-            @endif
+                
+                @if($countries->count() > 0)
+                    <div class="mt-3 text-center px-2 flex-shrink-0">
+                        <p class="text-muted small mb-0">{{ __('Showing') }} {{ $countries->count() }} {{ __('countries') }}</p>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -367,12 +368,12 @@
                                     </div>
                                     <div class="text-end" style="min-width: 80px;">
                                         <span class="fw-bold text-{{ $nColor }} d-block" style="font-size: 0.8rem;">{{ __($nSent) }}</span>
-                                        <a href="#" class="small text-decoration-none">{{ __('Read More') }} <i class="bi bi-arrow-right"></i></a>
+                                        <a href="{{ $news->url }}" target="_blank" class="small text-decoration-none">{{ __('Read More') }} <i class="bi bi-arrow-right"></i></a>
                                     </div>
                                 </div>
                             @endforeach
                             <div class="text-center mt-3 pt-2">
-                                <a href="#" class="btn btn-link text-decoration-none fw-bold small">{{ __('View All News') }} <i class="bi bi-arrow-right"></i></a>
+                                <a href="{{ route('user.news') }}" class="btn btn-link text-decoration-none fw-bold small">{{ __('View All News') }} <i class="bi bi-arrow-right"></i></a>
                             </div>
                         @else
                             <div class="text-center text-muted py-5">

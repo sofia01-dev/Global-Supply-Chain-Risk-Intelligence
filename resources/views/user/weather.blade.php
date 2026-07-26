@@ -6,7 +6,7 @@
 <!-- Leaflet CSS is already in app.blade.php, but just in case -->
 <style>
     .country-nav-list {
-        max-height: calc(100vh - 220px);
+        flex-grow: 1;
         overflow-y: auto;
         padding-right: 5px;
     }
@@ -68,64 +68,65 @@
 </style>
 @endpush
 
-@section('content')
-<div class="row mb-3">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="fw-bold mb-1">{{ __('Global Weather Monitoring') }}</h4>
-            <p class="text-muted small mb-0">{{ __('Monitor kondisi cuaca global secara realtime berdasarkan negara yang dipilih.') }}</p>
-        </div>
-    </div>
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Global Weather Monitoring') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Monitor global weather conditions in real-time based on the selected country.') }}</div>
 </div>
+@endsection
+
+@section('content')
 
 <div class="row g-4">
     <!-- LEFT PANEL: Country List -->
-    <div class="col-lg-3">
-        <div class="modern-card p-3 h-100">
-            <h6 class="fw-bold mb-3 px-2">{{ __('Select Country') }}</h6>
-            <div class="mb-3 px-2">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                    <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="{{ __('Search country...') }}">
+    <div class="col-lg-3 position-relative">
+        <div class="position-absolute" style="top: 0; bottom: 0; left: 12px; right: 12px;">
+            <div class="modern-card p-3 h-100 d-flex flex-column">
+                <h6 class="fw-bold mb-3 px-2 flex-shrink-0">{{ __('Select Country') }}</h6>
+                <div class="mb-3 px-2 flex-shrink-0">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="{{ __('Search country...') }}">
+                    </div>
                 </div>
-            </div>
-            
-            <div class="country-nav-list px-2">
-                @forelse($countries as $c)
-                    @php
-                        $isActive = $country && $country->id === $c->id;
-                        $w = $c->weatherCaches->first();
-                    @endphp
-                    <a href="{{ route('user.weather', ['country_id' => $c->id]) }}" class="country-item {{ $isActive ? 'active' : '' }}">
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fi fi-{{ strtolower($c->iso2_code ?? 'un') }} fs-4 rounded shadow-sm"></span>
-                            <div>
-                                <h6 class="mb-0 fw-bold {{ $isActive ? 'text-primary' : 'text-dark' }}" style="font-size: 0.85rem;">{{ $c->name }}</h6>
-                                <span class="text-muted" style="font-size: 0.7rem;">{{ $w ? $w->condition : 'Unknown' }}</span>
+                
+                <div class="country-nav-list px-2 flex-grow-1" style="overflow-y: auto;">
+                    @forelse($countries as $c)
+                        @php
+                            $isActive = $country && $country->id === $c->id;
+                            $w = $c->weatherCaches->first();
+                        @endphp
+                        <a href="{{ route('user.weather', ['country_id' => $c->id]) }}" class="country-item {{ $isActive ? 'active' : '' }}">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fi fi-{{ strtolower($c->iso2_code ?? 'un') }} fs-4 rounded shadow-sm"></span>
+                                <div>
+                                    <h6 class="mb-0 fw-bold {{ $isActive ? 'text-primary' : 'text-dark' }}" style="font-size: 0.85rem;">{{ $c->name }}</h6>
+                                    <span class="text-muted" style="font-size: 0.7rem;">{{ $w ? $w->condition : 'Unknown' }}</span>
+                                </div>
                             </div>
-                        </div>
-                        @if($w)
-                            <div class="text-end">
-                                <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">{{ round($w->temperature) }}°C</h6>
-                                @if(str_contains(strtolower($w->condition), 'rain'))
-                                    <i class="bi bi-cloud-rain text-primary" style="font-size: 0.7rem;"></i>
-                                @elseif(str_contains(strtolower($w->condition), 'cloud'))
-                                    <i class="bi bi-cloud text-secondary" style="font-size: 0.7rem;"></i>
-                                @elseif(str_contains(strtolower($w->condition), 'thunder') || str_contains(strtolower($w->condition), 'storm'))
-                                    <i class="bi bi-cloud-lightning text-danger" style="font-size: 0.7rem;"></i>
-                                @else
-                                    <i class="bi bi-sun text-warning" style="font-size: 0.7rem;"></i>
-                                @endif
-                            </div>
-                        @endif
-                    </a>
-                @empty
-                    <div class="text-center text-muted py-4 small">{{ __('No countries with weather data.') }}</div>
-                @endforelse
-            </div>
-            
-            <div class="mt-3 text-center px-2">
-                <button class="btn btn-light btn-sm w-100 text-primary fw-bold">{{ __('View All Countries') }}</button>
+                            @if($w)
+                                <div class="text-end">
+                                    <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">{{ round($w->temperature) }}°C</h6>
+                                    @if(str_contains(strtolower($w->condition), 'rain'))
+                                        <i class="bi bi-cloud-rain text-primary" style="font-size: 0.7rem;"></i>
+                                    @elseif(str_contains(strtolower($w->condition), 'cloud'))
+                                        <i class="bi bi-cloud text-secondary" style="font-size: 0.7rem;"></i>
+                                    @elseif(str_contains(strtolower($w->condition), 'thunder') || str_contains(strtolower($w->condition), 'storm'))
+                                        <i class="bi bi-cloud-lightning text-danger" style="font-size: 0.7rem;"></i>
+                                    @else
+                                        <i class="bi bi-sun text-warning" style="font-size: 0.7rem;"></i>
+                                    @endif
+                                </div>
+                            @endif
+                        </a>
+                    @empty
+                        <div class="text-center text-muted py-4 small">{{ __('No countries with weather data.') }}</div>
+                    @endforelse
+                </div>
+                
+                <div class="mt-auto text-center px-2 flex-shrink-0 pt-3">
+                    <button class="btn btn-light btn-sm w-100 text-primary fw-bold">{{ __('View All Countries') }}</button>
+                </div>
             </div>
         </div>
     </div>
@@ -208,63 +209,98 @@
             <!-- Bottom Row: Details, Alerts, Trend -->
             <div class="row g-3">
                 <!-- Details -->
-                <div class="col-md-4">
+                <div class="col">
                     <div class="modern-card p-4 h-100">
                         <h6 class="fw-bold mb-4">{{ __('Weather Details') }}</h6>
                         <ul class="list-unstyled mb-0">
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-cloud-rain me-2"></i>{{ __('Condition') }}</span>
-                                <span class="fw-bold small">{{ $wea ? $wea->condition : '-' }}</span>
+                            <li class="d-flex justify-content-between align-items-center py-2 px-2 mb-2 rounded hover-bg-light" style="transition: all 0.2s;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-cloud-rain"></i>
+                                    </div>
+                                    <span class="text-muted small fw-semibold">{{ __('Condition') }}</span>
+                                </div>
+                                <span class="fw-bold text-dark">{{ $wea ? $wea->condition : '-' }}</span>
                             </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-speedometer2 me-2"></i>{{ __('Pressure') }}</span>
-                                <span class="fw-bold small">{{ $current['surface_pressure'] ?? '-' }} hPa</span>
+                            <li class="d-flex justify-content-between align-items-center py-2 px-2 mb-2 rounded hover-bg-light" style="transition: all 0.2s;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-info bg-opacity-10 text-info" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-speedometer2"></i>
+                                    </div>
+                                    <span class="text-muted small fw-semibold">{{ __('Pressure') }}</span>
+                                </div>
+                                <span class="fw-bold text-dark">{{ $current['surface_pressure'] ?? '-' }} <span class="small text-muted fw-normal">hPa</span></span>
                             </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-clouds me-2"></i>{{ __('Cloud') }}</span>
-                                <span class="fw-bold small">{{ $current['cloud_cover'] ?? '-' }}%</span>
+                            <li class="d-flex justify-content-between align-items-center py-2 px-2 mb-2 rounded hover-bg-light" style="transition: all 0.2s;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-secondary bg-opacity-10 text-secondary" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-clouds"></i>
+                                    </div>
+                                    <span class="text-muted small fw-semibold">{{ __('Cloud') }}</span>
+                                </div>
+                                <span class="fw-bold text-dark">{{ $current['cloud_cover'] ?? '-' }}<span class="small text-muted fw-normal">%</span></span>
                             </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-sunrise me-2"></i>{{ __('Sunrise') }}</span>
-                                <span class="fw-bold small">
+                            <li class="d-flex justify-content-between align-items-center py-2 px-2 mb-2 rounded hover-bg-light" style="transition: all 0.2s;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 text-warning" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-sunrise"></i>
+                                    </div>
+                                    <span class="text-muted small fw-semibold">{{ __('Sunrise') }}</span>
+                                </div>
+                                <span class="fw-bold text-dark">
                                     {{ isset($daily['sunrise'][0]) ? \Carbon\Carbon::parse($daily['sunrise'][0])->format('H:i A') : '-' }}
                                 </span>
                             </li>
-                            <li class="d-flex justify-content-between border-bottom py-2">
-                                <span class="text-muted small"><i class="bi bi-sunset me-2"></i>{{ __('Sunset') }}</span>
-                                <span class="fw-bold small">
+                            <li class="d-flex justify-content-between align-items-center py-2 px-2 mb-2 rounded hover-bg-light" style="transition: all 0.2s;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-sunset"></i>
+                                    </div>
+                                    <span class="text-muted small fw-semibold">{{ __('Sunset') }}</span>
+                                </div>
+                                <span class="fw-bold text-dark">
                                     {{ isset($daily['sunset'][0]) ? \Carbon\Carbon::parse($daily['sunset'][0])->format('H:i A') : '-' }}
                                 </span>
                             </li>
-                            <li class="d-flex justify-content-between pt-3">
-                                <span class="text-muted small"><i class="bi bi-clock me-2"></i>{{ __('Last Updated') }}</span>
-                                <span class="fw-bold small">{{ $wea ? $wea->updated_at->format('M d, Y H:i') : '-' }}</span>
-                            </li>
                         </ul>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top px-2">
+                            <span class="text-muted" style="font-size: 0.7rem;"><i class="bi bi-clock me-1"></i>{{ __('Last Updated') }}</span>
+                            <span class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $wea ? $wea->updated_at->format('M d, Y H:i') : '-' }}</span>
+                        </div>
+                        <style>
+                            .hover-bg-light:hover { background-color: #f8f9fa; transform: translateX(5px); }
+                        </style>
                     </div>
                 </div>
 
                 <!-- Alerts -->
-                <div class="col-md-4">
-                    <div class="modern-card p-4 h-100">
-                        <h6 class="fw-bold mb-4">{{ __('Weather Alerts') }}</h6>
+                <div class="col">
+                    <div class="modern-card p-4 h-100 d-flex flex-column">
+                        <h6 class="fw-bold mb-4 flex-shrink-0">{{ __('Weather Alerts') }}</h6>
                         
-                        <div class="alert-card-item bg-light-{{ $weatherAlert['type'] }} border border-{{ $weatherAlert['type'] }} border-opacity-25">
-                            <i class="bi bi-exclamation-triangle-fill text-{{ $weatherAlert['type'] }} fs-4 mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold text-{{ $weatherAlert['type'] }} mb-1" style="font-size: 0.9rem;">{{ __($weatherAlert['title']) }}</h6>
-                                <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ __($weatherAlert['message']) }}</p>
+                        <div class="d-flex flex-column flex-grow-1 gap-2 mt-2">
+                            @foreach($weatherAlerts as $alert)
+                            <div class="d-flex justify-content-between align-items-center bg-{{ $alert['type'] }} bg-opacity-10 rounded-3 px-3 py-2 border-0">
+                                <div class="d-flex gap-3 align-items-center">
+                                    <i class="bi {{ $alert['icon'] }} text-{{ $alert['type'] }} fs-4"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">{{ $alert['title'] }}</h6>
+                                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ $alert['message'] }}</p>
+                                    </div>
+                                </div>
+                                <span class="badge bg-{{ $alert['type'] }} rounded-pill px-3">{{ $alert['badge'] }}</span>
                             </div>
+                            @endforeach
                         </div>
 
                     </div>
                 </div>
 
                 <!-- Trend -->
-                <div class="col-md-4">
-                    <div class="modern-card p-4 h-100">
-                        <h6 class="fw-bold mb-4">{{ __('24 Hours Weather Trend') }}</h6>
-                        <div style="height: 180px; position: relative;">
+                <div class="col-md-5">
+                    <div class="modern-card p-4 h-100 d-flex flex-column">
+                        <h6 class="fw-bold mb-4 flex-shrink-0">{{ __('24 Hours Weather Trend') }}</h6>
+                        <div class="flex-grow-1 position-relative" style="min-height: 180px;">
                             @if(isset($rawData['hourly']['temperature_2m']) && count($rawData['hourly']['temperature_2m']) > 0)
                                 <canvas id="trendChart"></canvas>
                             @else
@@ -272,9 +308,6 @@
                                     {{ __('Data histori belum tersedia') }}
                                 </div>
                             @endif
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="#" class="small text-decoration-none fw-bold">{{ __('View Full Forecast') }} <i class="bi bi-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -289,6 +322,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Live Search functionality
@@ -398,6 +432,10 @@
                 }
             }
 
+            if (typeof ChartDataLabels !== 'undefined') {
+                Chart.register(ChartDataLabels);
+            }
+
             new Chart(trendCtx, {
                 type: 'line',
                 data: {
@@ -408,10 +446,10 @@
                         borderColor: '#1C55FF',
                         backgroundColor: 'rgba(28, 85, 255, 0.1)',
                         borderWidth: 2,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#1C55FF',
+                        pointBackgroundColor: '#1C55FF',
+                        pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 4,
+                        pointRadius: 5,
                         fill: true,
                         tension: 0.4
                     }]
@@ -419,10 +457,71 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    layout: {
+                        padding: {
+                            top: 25,
+                            right: 20,
+                            left: 10,
+                            bottom: 10
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            align: 'start',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                color: '#4b5563'
+                            }
+                        },
+                        datalabels: {
+                            color: '#1f2937',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4,
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value) {
+                                return value + '°C';
+                            }
+                        }
+                    },
                     scales: {
-                        x: { grid: { display: false } },
-                        y: { display: false, min: Math.min(...displayTemps) - 2, max: Math.max(...displayTemps) + 2 }
+                        x: { 
+                            grid: { display: false },
+                            ticks: {
+                                color: '#6b7280',
+                                font: { size: 11 }
+                            }
+                        },
+                        y: { 
+                            display: true, 
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: { size: 11 },
+                                callback: function(value) {
+                                    return value + '°C';
+                                },
+                                stepSize: 4
+                            },
+                            min: Math.min(...displayTemps) - 4, 
+                            max: Math.max(...displayTemps) + 4 
+                        }
                     }
                 }
             });

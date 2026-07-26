@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Port Location Dashboard') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Global Interactive Map for Port Tracking') }}</div>
+</div>
+@endsection
+
 @section('content')
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-end mb-3">
-        <div>
-            <h3 class="fw-bold mb-0 text-dark">{{ __('Port Location Dashboard') }}</h3>
-            <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ __('Global Interactive Map for Port Tracking') }}</p>
-        </div>
-    </div>
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-relative" style="height: 75vh;">
         <!-- Leaflet Map Container -->

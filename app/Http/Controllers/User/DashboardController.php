@@ -18,14 +18,23 @@ class DashboardController extends Controller
 
     public function index()
     {
+        // Fitur Pembaruan Otomatis (Hanya untuk Development):
+        // Cek apakah data historis tertinggal dari tanggal hari ini. Jika ya, jalankan ulang seeder.
+        $lastRiskDate = \Illuminate\Support\Facades\DB::table('risk_score_histories')->max('calculated_at');
+        if (!$lastRiskDate || \Carbon\Carbon::parse($lastRiskDate)->startOfDay()->lt(now()->startOfDay())) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                '--class' => 'DashboardHistoricalSeeder',
+                '--force' => true
+            ]);
+        }
+
         $recentShipments = $this->dashboardService->getRecentShipments()->map(function($shipment) {
             $monitorObj = $this->monitoringService->monitor($shipment);
-            // Attach monitor object to shipment for the view
             $shipment->monitoring = $monitorObj;
             return $shipment;
         });
 
-        // Get top 10 risky active shipments for the AI Recommendation Modal
+        // Dapatkan 10 pengiriman aktif berisiko teratas untuk Modal Rekomendasi AI.
         $aiRecommendationsList = \App\Models\Shipment::whereNotIn('current_status', ['Delivered', 'Cancelled'])
             ->get()
             ->map(function($shipment) {

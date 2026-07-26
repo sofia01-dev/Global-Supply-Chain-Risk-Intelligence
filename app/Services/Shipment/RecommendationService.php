@@ -10,7 +10,6 @@ class RecommendationService
             return __('No action needed. Shipment is :status.', ['status' => __($currentStatus)]);
         }
 
-        // Base recommendation
         if ($riskLevel === 'Critical') {
             return __('Immediate Rerouting Recommended');
         } elseif ($riskLevel === 'High') {
@@ -25,7 +24,6 @@ class RecommendationService
             return __('Increase Monitoring');
         }
         
-        // Low risk but bad weather
         if ($weatherPenalty > 0) {
             return __('Monitor Weather Conditions');
         }
@@ -33,7 +31,6 @@ class RecommendationService
         return __('Proceed Normally');
     }
 
-    // Maintain backward compatibility for existing controllers if needed temporarily
     public function generateForShipment($shipment)
     {
         $destinationCountry = $shipment->destinationPort ? $shipment->destinationPort->country : null;
@@ -128,16 +125,13 @@ class RecommendationService
             $recommendations[] = __('Prepare alternative supplier plan.');
         }
 
-        // Default recommendations at top
         array_unshift($recommendations, __('Monitor shipment status daily.'));
         
-        // Ensure at least some default impact if everything is calm
         if (empty($impacts)) {
             $impacts[] = ['icon' => 'bi-check-circle', 'text' => __('Market remains stable with balanced conditions.')];
         }
 
         $confidence = 100 - ($sentimentData['neutral_pct'] ?? 100);
-        // Add a base confidence so it doesn't drop too low if neutral is very high
         if ($confidence < 40) $confidence = rand(65, 85); 
 
         return [

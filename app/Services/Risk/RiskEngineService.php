@@ -36,8 +36,6 @@ class RiskEngineService
                 if ($weather) {
                     $temp = $weather->temperature ?? 25;
                     $wind = $weather->wind_speed ?? 0;
-                    
-                    // Simple heuristic: Extreme temp (>35 or <0) increases risk, high wind increases risk
                     $tempRisk = ($temp > 35 || $temp < 0) ? 80 : (($temp > 30 || $temp < 10) ? 40 : 10);
                     $windRisk = min(($wind / 100) * 100, 100);
                     
@@ -50,7 +48,7 @@ class RiskEngineService
                 $eco = $country->economicIndicator;
                 if ($eco && $eco->inflation_rate !== null) {
                     $inf = $eco->inflation_rate;
-                    // Deflation (negative) or High Inflation (>15%) is risky
+                    // Deflasi (negatif) atau inflasi tinggi (>15%) mengandung risiko.
                     if ($inf < 0) {
                         $inflationRisk = min(abs($inf) * 10, 100);
                     } else {
@@ -61,15 +59,12 @@ class RiskEngineService
                 }
 
                 // 3. Currency / Exchange Rate Risk (20%)
-                // The nominal value of the exchange rate is NOT a reliable indicator of risk.
-                // Since historical volatility (change rate) is not available, we use a neutral value (50).
-                // Documentation: This module is ready to be upgraded to volatility-based calculations in future versions.
                 $currencyRisk = 50; 
 
                 // 4. News Sentiment Risk (25%)
                 $newsList = $country->newsCaches()->latest()->take(5)->get();
                 
-                // If country has no specific news, fallback to Global News (country_id IS NULL)
+                // Jika negara tidak memiliki berita khusus, gunakan Berita Global sebagai cadangan 
                 if ($newsList->isEmpty()) {
                     $newsList = \App\Models\NewsCache::whereNull('country_id')->latest()->take(5)->get();
                 }
@@ -93,7 +88,6 @@ class RiskEngineService
                     $newsRisk = 50; // Fallback
                 }
 
-                // Fetch weights from database to match the Task Requirement perfectly
                 $factors = \App\Models\RiskFactor::pluck('weight', 'factor')->toArray();
                 
                 $weightWeather = ($factors['Weather'] ?? 30) / 100;
@@ -101,7 +95,7 @@ class RiskEngineService
                 $weightNews = ($factors['Political News'] ?? 40) / 100;
                 $weightCurrency = ($factors['Currency'] ?? 10) / 100;
 
-                // Combine Overall Risk Score using Weighted Risk Model
+                // Menggabungkan Skor Risiko Keseluruhan menggunakan Model Risiko Berbobot
                 $finalScore = ($weatherRisk * $weightWeather) 
                             + ($inflationRisk * $weightInflation) 
                             + ($currencyRisk * $weightCurrency) 
@@ -120,7 +114,6 @@ class RiskEngineService
                     $riskLevel = 'Critical';
                 }
 
-                // Save to Database (Langkah 1: History Log)
                 \App\Models\RiskScoreHistory::create([
                     'country_id' => $country->id,
                     'final_score' => round($finalScore, 2),
@@ -128,7 +121,6 @@ class RiskEngineService
                     'calculated_at' => now()
                 ]);
 
-                // Save to Database (Langkah 2: Update Snapshot)
                 RiskScore::updateOrCreate(
                     ['country_id' => $country->id],
                     [
@@ -140,7 +132,6 @@ class RiskEngineService
 
                 $stats['success_count']++;
 
-                // Store a few examples for the final report
                 if (count($stats['examples']) < 5 && in_array($country->name, ['Germany', 'China', 'Indonesia', 'United States', 'Brazil'])) {
                     $actualLevelStr = ($finalScore > 75) ? 'Critical Risk' : $riskLevel . ' Risk';
                     $stats['examples'][] = "{$country->name} : " . round($finalScore, 2) . " ({$actualLevelStr})";

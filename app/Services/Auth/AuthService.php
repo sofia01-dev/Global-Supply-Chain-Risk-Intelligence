@@ -16,7 +16,8 @@ class AuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'user', // Default role based on requirements
+            'country_id' => $data['country_id'],
+            'role' => 'user', 
         ]);
 
         event(new Registered($user));

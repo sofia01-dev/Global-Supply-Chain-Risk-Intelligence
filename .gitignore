@@ -36,3 +36,4 @@ api_response*.txt
 *.tmp
 
 seed_currency.php
+_ide_helper.php

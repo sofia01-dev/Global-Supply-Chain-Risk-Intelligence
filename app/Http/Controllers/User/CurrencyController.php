@@ -32,19 +32,19 @@ class CurrencyController extends Controller
 
         $topCurrencies = $this->currencyApiService->getTopCurrencies();
         
-        // Fetch IDR rate to use as Base
+        // Ambil kurs IDR untuk digunakan sebagai basis
         $idrRecord = \App\Models\CurrencyCache::where('currency_code', 'IDR')->orderBy('created_at', 'desc')->first();
         $idrRate = $idrRecord ? (float) $idrRecord->exchange_rate_usd : 16000.0;
 
-        // Convert top currencies to IDR cross rate
+        // Konversi mata uang utama ke kurs silang IDR
         foreach ($topCurrencies as $top) {
             $targetRate = (float) $top->exchange_rate_usd;
             $top->converted_rate = $targetRate > 0 ? ($idrRate / $targetRate) : 0;
         }
 
-        // Fetch historical data for the selected currency
-        $history = \App\Models\CurrencyCache::where('currency_code', $selectedCurrency->currency_code)
-            ->orderBy('created_at', 'asc')
+        // Ambil data historis untuk mata uang yang dipilih
+        $history = \App\Models\CurrencyHistory::where('currency_code', $selectedCurrency->currency_code)
+            ->orderBy('recorded_date', 'asc')
             ->get();
 
         $dailyChange = 0.0;
@@ -54,28 +54,23 @@ class CurrencyController extends Controller
         $historicalData = [];
 
         if ($history->count() > 1) {
-            // Convert history to IDR cross rates
-            // Assuming IDR rate was roughly the same historically for simplicity, or we can fetch historical IDR.
-            // For true accuracy, we should fetch IDR history too, but for UI demonstration, we'll use current IDR rate.
-            
-            // Actually, let's fetch IDR history to match exactly!
-            $idrHistory = \App\Models\CurrencyCache::where('currency_code', 'IDR')
-                ->orderBy('created_at', 'asc')
+            $idrHistory = \App\Models\CurrencyHistory::where('currency_code', 'IDR')
+                ->orderBy('recorded_date', 'asc')
                 ->get()
-                ->keyBy(function($item) { return $item->created_at->format('Y-m-d'); });
+                ->keyBy(function($item) { return \Carbon\Carbon::parse($item->recorded_date)->format('Y-m-d'); });
 
             $latestConverted = 0;
             $yesterdayConverted = 0;
             $lastWeekConverted = 0;
 
             foreach ($history as $record) {
-                $dateKey = $record->created_at->format('Y-m-d');
+                $dateKey = \Carbon\Carbon::parse($record->recorded_date)->format('Y-m-d');
                 $histIdrRate = isset($idrHistory[$dateKey]) ? (float) $idrHistory[$dateKey]->exchange_rate_usd : $idrRate;
                 
                 $targetRate = (float) $record->exchange_rate_usd;
                 $convertedRate = $targetRate > 0 ? ($histIdrRate / $targetRate) : 0;
 
-                $historicalLabels[] = $record->created_at->format('M d');
+                $historicalLabels[] = \Carbon\Carbon::parse($record->recorded_date)->format('M d');
                 $historicalData[] = $convertedRate;
             }
 

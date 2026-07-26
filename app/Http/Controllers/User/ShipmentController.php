@@ -20,17 +20,15 @@ class ShipmentController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $filters = $request->only(['search', 'status', 'risk_level']);
-        
-        // Paginated results
         $shipments = $this->shipmentService->getAllForUser($filters);
         
-        // Map monitoring data to items
+        // Memetakan data pemantauan ke item
         $shipments->getCollection()->transform(function($shipment) {
             $shipment->monitoring = $this->monitoringService->monitor($shipment);
             return $shipment;
         });
 
-        // Countries list for filter dropdowns
+        // Daftar negara untuk menu pilihan (dropdown) filter
         $countries = \App\Models\Country::orderBy('name')->get();
 
         return view('user.shipments.index', compact('shipments', 'filters', 'countries'));
@@ -48,10 +46,8 @@ class ShipmentController extends Controller
             $mapData[] = ['type' => 'Destination', 'name' => $shipment->destinationPort->name, 'lat' => $shipment->destinationPort->latitude, 'lng' => $shipment->destinationPort->longitude];
         }
         
-        // Single Source of Truth Monitoring Object
         $monitorObj = $this->monitoringService->monitor($shipment);
         
-        // Check if AJAX request for auto-refresh
         if ($request->ajax()) {
             return response()->json([
                 'monitorObj' => $monitorObj
@@ -64,7 +60,6 @@ class ShipmentController extends Controller
     public function create()
     {
         $countries = \App\Models\Country::orderBy('name')->get();
-        // Fallback for non-ajax loading
         $ports = \App\Models\Port::with('country')->get();
         return view('user.shipments.create', compact('ports', 'countries'));
     }
@@ -90,7 +85,6 @@ class ShipmentController extends Controller
     {
         $shipment = $this->shipmentService->getByIdForUser($id);
         $countries = \App\Models\Country::orderBy('name')->get();
-        // Fallback for non-ajax loading, load all ports
         $ports = \App\Models\Port::with('country')->get();
         return view('user.shipments.edit', compact('shipment', 'ports', 'countries'));
     }

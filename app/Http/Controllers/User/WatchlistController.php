@@ -3,8 +3,10 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Watchlist;
 use App\Services\Dashboard\CountryDashboardService;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 
 class WatchlistController extends Controller
 {
@@ -15,7 +17,8 @@ class WatchlistController extends Controller
     }
 
     public function index() {
-        $user = auth()->user();
+        /** @var User $user */
+        $user = Auth::user();
         $watchlists = $user->watchlists()->with('country')->get();
         
         $countries = collect();
@@ -36,7 +39,7 @@ class WatchlistController extends Controller
             'country_id' => 'required|exists:countries,id'
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $countryId = $request->country_id;
 
         $existing = $user->watchlists()->where('country_id', $countryId)->first();

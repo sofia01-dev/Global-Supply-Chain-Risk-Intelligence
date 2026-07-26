@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use Illuminate\Support\Facades\Auth;
 
 class ArticleController extends Controller
 {
@@ -21,18 +22,14 @@ class ArticleController extends Controller
         }
 
         $articles = $query->paginate(10);
-
-        // KPIs
         $totalArticles = Article::count();
         $publishedArticles = Article::where('is_published', true)->count();
         $draftArticles = $totalArticles - $publishedArticles;
         $publishedPercentage = $totalArticles > 0 ? round(($publishedArticles / $totalArticles) * 100, 1) : 0;
-        
-        // Latest Update
         $latestArticle = Article::latest('updated_at')->first();
         
         // Charts Data
-        // Monthly stats (last 12 months)
+        // Statistik bulanan (12 bulan terakhir)
         $monthlyStats = Article::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
             ->whereYear('created_at', date('Y'))
             ->groupBy('month')
@@ -43,7 +40,7 @@ class ArticleController extends Controller
             $chartData[] = $monthlyStats[$m] ?? 0;
         }
 
-        // Category distribution
+        // Distribusi kategori
         $categories = Article::selectRaw('category, COUNT(*) as count')
             ->whereNotNull('category')
             ->groupBy('category')
@@ -89,7 +86,7 @@ class ArticleController extends Controller
         }
 
         Article::create([
-            'admin_id' => auth()->id(),
+            'admin_id' => Auth::id(),
             'title' => $request->title,
             'slug' => \Illuminate\Support\Str::slug($request->title),
             'category' => $request->category,

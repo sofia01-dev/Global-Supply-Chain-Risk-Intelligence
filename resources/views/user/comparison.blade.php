@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('content')
-<!-- Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h3 class="fw-bold mb-1 text-dark">{{ __('Country Comparison Engine') }}</h3>
-        <p class="text-muted small mb-0">{{ __('Compare economic, risk, weather and currency indicators between countries.') }}</p>
-    </div>
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Country Comparison Engine') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Compare economic, risk, weather and currency indicators between countries.') }}</div>
 </div>
+@endsection
+
+@section('content')
 
 <!-- Selectors -->
 <div class="card border-0 shadow-sm rounded-4 mb-4">

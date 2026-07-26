@@ -4,6 +4,8 @@ use App\Http\Controllers\Controller;
 use App\Services\Dashboard\CountryDashboardService;
 use App\Services\Shipment\RecommendationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class CountryController extends Controller
 {
@@ -39,8 +41,11 @@ class CountryController extends Controller
                     ]
                 ];
             }
-            if (auth()->check()) {
-                $isFavorited = auth()->user()->watchlists()->where('country_id', $country->id)->exists();
+           if (Auth::check()) {
+                $isFavorited = Auth::user()
+                    ->watchlists()
+                    ->where('country_id', $country->id)
+                    ->exists();
             }
         }
         
@@ -69,8 +74,14 @@ class CountryController extends Controller
         }
 
         $isFavorited = false;
-        if ($country && auth()->check()) {
-            $isFavorited = auth()->user()->watchlists()->where('country_id', $country->id)->exists();
+        if ($country && Auth::check()) {
+
+            /** @var User $user */
+            $user = Auth::user();
+
+            $isFavorited = $user->watchlists()
+                ->where('country_id', $country->id)
+                ->exists();
         }
 
         return view('user.country', compact('countries', 'country', 'aiRecommendation', 'search', 'isFavorited'));

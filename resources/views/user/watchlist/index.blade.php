@@ -7,14 +7,15 @@
 
 @section('title', __('Favorites Monitoring'))
 
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Favorites Monitoring') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Track and monitor your favorited countries in real-time.') }}</div>
+</div>
+@endsection
+
 @section('content')
 <div class="container-fluid px-4 py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold text-dark mb-1">{{ __('Favorites Monitoring') }}</h4>
-            <p class="text-muted mb-0">{{ __('Track and monitor your favorited countries in real-time.') }}</p>
-        </div>
-    </div>
 
     @if($countries->isEmpty())
         <div class="card border-0 shadow-sm rounded-4 text-center py-5">

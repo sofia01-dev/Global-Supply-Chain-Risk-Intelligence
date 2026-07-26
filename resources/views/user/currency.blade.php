@@ -72,50 +72,73 @@
 </style>
 @endpush
 
-@section('content')
-<div class="row mb-3">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="fw-bold mb-1">{{ __('Currency Impact Dashboard') }}</h4>
-            <p class="text-muted small mb-0">{{ __('Monitor exchange rate impact on global supply chain') }}</p>
-        </div>
-        <div class="d-flex gap-3 align-items-center text-muted small">
-            <div><i class="bi bi-calendar3"></i> {{ __('Last Update:') }} {{ \Carbon\Carbon::now()->format('M d, Y H:i A') }}</div>
-        </div>
-    </div>
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Currency Impact Dashboard') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Monitor exchange rate impact on global supply chain') }}</div>
 </div>
+@endsection
+
+@section('header_actions')
+<div class="d-none d-md-flex align-items-center gap-2 text-muted px-3 py-1 rounded-pill bg-light border border-secondary border-opacity-10 shadow-sm" style="font-size: 0.75rem; font-weight: 600;">
+    <i class="bi bi-clock-history text-primary"></i> 
+    <span>{{ __('Last Update:') }} {{ \Carbon\Carbon::now()->format('M d, Y H:i A') }}</span>
+</div>
+@endsection
+
+@section('content')
 
 <div class="row g-4">
     <!-- FULL WIDTH PANEL -->
     <div class="col-lg-12">
         <!-- Dual-Card Currency Selector -->
-        <div class="modern-card p-4 mb-4">
-            <div class="row align-items-center justify-content-center text-center">
+        <div class="modern-card p-4 p-md-5 mb-4 position-relative overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f4f6fa 100%);">
+            <!-- Decorative Background Element -->
+            <div class="position-absolute rounded-circle" style="width: 300px; height: 300px; background: radial-gradient(circle, rgba(13,110,253,0.05) 0%, rgba(255,255,255,0) 70%); top: -100px; right: -50px;"></div>
+            
+            <div class="row align-items-center justify-content-center text-center position-relative z-1">
                 <!-- Target Currency (Left) -->
-                <div class="col-md-5">
+                <div class="col-md-5 mb-4 mb-md-0">
                     @php 
                         $sIso = $selectedCurrency ? strtolower(substr($selectedCurrency->currency_code, 0, 2)) : 'us'; 
                         $sCode = $selectedCurrency ? $selectedCurrency->currency_code : 'USD';
                     @endphp
-                    <div class="border rounded-4 p-4 d-inline-block w-100 position-relative bg-light" style="cursor: pointer; transition: all 0.2s;" data-bs-toggle="modal" data-bs-target="#currencyModal" onmouseover="this.classList.add('shadow-sm')" onmouseout="this.classList.remove('shadow-sm')">
-                        <span class="position-absolute top-0 end-0 mt-3 me-3 text-primary"><i class="bi bi-pencil-square"></i></span>
-                        <div class="mb-2">
-                            <span class="fi fi-{{ $sIso }} rounded-circle border shadow-sm" style="width: 48px; height: 48px; font-size: 48px;"></span>
+                    <!-- Interactive Selector Card -->
+                    <div class="border-0 rounded-4 p-4 d-inline-block w-100 position-relative bg-white shadow-sm currency-selector-card" 
+                         style="cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 1px solid rgba(0,0,0,0.05) !important;" 
+                         data-bs-toggle="modal" data-bs-target="#currencyModal" 
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.08)';" 
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.03)';">
+                        
+                        <!-- Hover Edit Indicator -->
+                        <div class="position-absolute top-0 end-0 m-3 bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="bi bi-pencil-square text-primary" style="font-size: 0.9rem;"></i>
                         </div>
-                        <h4 class="fw-bold mb-0 text-dark">1 {{ $sCode }}</h4>
-                        <small class="text-muted">{{ __('Click to change target currency') }}</small>
+                        
+                        <div class="flag-container mb-3 d-inline-block position-relative">
+                            <span class="fi fi-{{ $sIso }} rounded-circle shadow-sm" style="width: 56px; height: 56px; font-size: 56px; display: block; border: 2px solid #fff;"></span>
+                            <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle border border-2 border-white d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; right: -5px !important;">
+                                <i class="bi bi-chevron-down text-white" style="font-size: 0.6rem;"></i>
+                            </div>
+                        </div>
+                        
+                        <h2 class="fw-bolder text-dark mb-1" style="letter-spacing: -0.5px;">1 <span class="text-primary">{{ $sCode }}</span></h2>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill mt-2 fw-medium" style="font-size: 0.75rem;">
+                            {{ __('Click to change target currency') }}
+                        </span>
                     </div>
                 </div>
 
-                <!-- Separator (Middle) -->
-                <div class="col-md-2 my-3 my-md-0">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-auto" style="width: 50px; height: 50px;">
+                <!-- Arrow Middle -->
+                <div class="col-md-2 d-flex justify-content-center align-items-center z-2">
+                    <div class="exchange-arrow-wrapper d-inline-flex align-items-center justify-content-center bg-white shadow-sm text-primary rounded-circle" 
+                         style="width: 56px; height: 56px; border: 1px solid rgba(13,110,253,0.1); z-index: 5; margin: -15px 0;">
                         <i class="bi bi-arrow-left-right fs-4"></i>
                     </div>
                 </div>
 
                 <!-- IDR Base (Right) -->
-                <div class="col-md-5">
+                <div class="col-md-5 mt-4 mt-md-0">
                     @php
                         $cRate = 0;
                         if ($selectedCurrency) {
@@ -123,12 +146,27 @@
                             $cRate = $tRate > 0 ? ($idrRate / $tRate) : 0;
                         }
                     @endphp
-                    <div class="border rounded-4 p-4 d-inline-block w-100 bg-white shadow-sm border-primary">
-                        <div class="mb-2">
-                            <span class="fi fi-id rounded-circle border shadow-sm" style="width: 48px; height: 48px; font-size: 48px;"></span>
+                    <!-- Premium IDR Card -->
+                    <div class="border-0 rounded-4 p-4 d-inline-block w-100 shadow-sm position-relative overflow-hidden text-white" 
+                         style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                        
+                        <!-- Decorative Shapes -->
+                        <div class="position-absolute opacity-25" style="top: -20px; right: -20px;">
+                            <i class="bi bi-globe-americas" style="font-size: 8rem;"></i>
                         </div>
-                        <h2 class="fw-bold mb-0 text-primary" style="font-size: 2.5rem; letter-spacing: -1px;">Rp {{ number_format($cRate, 2, ',', '.') }}</h2>
-                        <small class="text-muted fw-bold">IDR (Indonesian Rupiah)</small>
+                        
+                        <div class="position-relative z-1">
+                            <span class="fi fi-id rounded-circle shadow-sm mb-3 d-inline-block" style="width: 56px; height: 56px; font-size: 56px; border: 2px solid rgba(255,255,255,0.2);"></span>
+                            
+                            <h2 class="fw-bolder mb-1" style="letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                Rp {{ number_format($cRate, 2, ',', '.') }}
+                            </h2>
+                            <div class="d-inline-block mt-2">
+                                <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill fw-medium" style="backdrop-filter: blur(4px);">
+                                    <i class="bi bi-shield-check me-1"></i> IDR (Indonesian Rupiah)
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -172,71 +210,66 @@
                 <p class="text-muted">{{ __('Please select a currency pair to view impact analysis.') }}</p>
             </div>
         @else
-            <!-- Exchange Rate Trend Chart -->
-            <div class="modern-card p-4 mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold mb-0">{{ __('Exchange Rate Trend') }} (IDR / {{ $selectedCurrency->currency_code }})</h6>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-primary">7D</button>
-                        <button type="button" class="btn btn-outline-primary">30D</button>
-                        <button type="button" class="btn btn-outline-primary">90D</button>
-                        <button type="button" class="btn btn-outline-primary">1Y</button>
-                        <button type="button" class="btn btn-outline-primary"><i class="bi bi-calendar3"></i></button>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                    <!-- Empty State Overlay for Chart -->
-                    @if(empty($historicalData) || count($historicalData) <= 1)
-                    <div class="empty-chart-overlay text-center">
-                        <div>
-                            <i class="bi bi-bar-chart text-muted opacity-50 mb-2" style="font-size: 2rem;"></i>
-                            <h6 class="fw-bold text-muted mb-0">{{ __('Data histori kurs belum tersedia') }}</h6>
-                            <p class="small text-muted mb-0">{{ __('Sistem sedang menunggu siklus sinkronisasi histori selanjutnya.') }}</p>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-            </div>
-
-
-            <!-- Bottom Row: Insight -->
-            <div class="row g-4">
-                <!-- AI Currency Insight -->
-                <div class="col-12">
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <div class="modern-card insight-card p-4 h-100">
-                                <div class="d-flex align-items-center gap-2 mb-3">
-                                    <div class="bg-primary bg-opacity-10 rounded p-2 text-primary">
-                                        <i class="bi bi-robot fs-5"></i>
-                                    </div>
-                                    <h6 class="fw-bold mb-0">{{ __('AI Currency Insight') }}</h6>
-                                </div>
-                                <p class="text-dark fw-medium small mb-4">{{ __($insight['summary']) }}</p>
-                                
-                                <h6 class="fw-bold small mb-2">{{ __('Potential Impact') }} :</h6>
-                                <ul class="list-unstyled mb-4">
-                                    @foreach($insight['impacts'] as $imp)
-                                    <li class="d-flex align-items-center gap-2 mb-2">
-                                        <i class="bi bi-check-circle-fill text-success"></i>
-                                        <span class="small text-muted">{{ __($imp) }}</span>
-                                    </li>
-                                    @endforeach
-                                </ul>
-
-                                <div class="bg-white border rounded p-3 d-flex gap-3 align-items-start">
-                                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2">
-                                        <i class="bi bi-lightbulb fs-5"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-bold small mb-1">{{ __('Recommendation') }} :</h6>
-                                        <p class="small text-muted mb-0">{{ __($insight['recommendation']) }}</p>
-                                    </div>
-                                </div>
+            <!-- Middle Row: Chart & Insight Side by Side -->
+            <div class="row g-4 mb-4">
+                <!-- Left Column: Trend Chart (8 parts) -->
+                <div class="col-lg-8 col-md-12">
+                    <div class="modern-card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold mb-0">{{ __('Exchange Rate Trend') }} (IDR / {{ $selectedCurrency->currency_code }})</h6>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-primary disabled" style="opacity: 1;">7 Days</button>
                             </div>
                         </div>
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                            <!-- Empty State Overlay for Chart -->
+                            @if(empty($historicalData) || count($historicalData) <= 1)
+                            <div class="empty-chart-overlay text-center">
+                                <div>
+                                    <i class="bi bi-bar-chart text-muted opacity-50 mb-2" style="font-size: 2rem;"></i>
+                                    <h6 class="fw-bold text-muted mb-0">{{ __('Data histori kurs belum tersedia') }}</h6>
+                                    <p class="small text-muted mb-0">{{ __('Sistem sedang menunggu siklus sinkronisasi histori selanjutnya.') }}</p>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 
+
+                <!-- Right Column: AI Insight (4 parts) -->
+                <div class="col-lg-4 col-md-12">
+                    <div class="modern-card insight-card p-4 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded p-2 text-primary">
+                                <i class="bi bi-robot fs-5"></i>
+                            </div>
+                            <h6 class="fw-bold mb-0">{{ __('AI Currency Insight') }}</h6>
+                        </div>
+                        <p class="text-dark fw-medium small mb-4">{{ __($insight['summary']) }}</p>
+                        
+                        <h6 class="fw-bold small mb-2">{{ __('Potential Impact') }} :</h6>
+                        <ul class="list-unstyled mb-4">
+                            @foreach($insight['impacts'] as $imp)
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <span class="small text-muted">{{ __($imp) }}</span>
+                            </li>
+                            @endforeach
+                        </ul>
+
+                        <div class="rounded p-3 d-flex gap-3 align-items-start mt-auto" style="background-color: #f8f7ff; border: 1px solid #edeafc;">
+                            <div class="rounded-circle p-2 d-flex align-items-center justify-content-center" style="background-color: #ebe7fe; color: #5c3ce6; width: 40px; height: 40px;">
+                                <i class="bi bi-lightbulb-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold small mb-1" style="color: #4328b7;">{{ __('Recommendation') }} :</h6>
+                                <p class="small text-muted mb-0">{{ __($insight['recommendation']) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         @endif
     </div>

@@ -270,16 +270,21 @@
             <div class="top-navbar">
                 <div class="d-flex align-items-center gap-3">
                     <button class="sidebar-toggler" id="sidebarToggle"><i class="bi bi-list"></i></button>
-                    <h5 class="m-0 fw-semibold d-none d-sm-block text-capitalize">{{ __(str_replace(['user.', 'admin.', 'index'], '', Route::currentRouteName() ?? 'Dashboard')) }}</h5>
+                    @hasSection('page_header')
+                        @yield('page_header')
+                    @else
+                        <h5 class="m-0 fw-semibold d-none d-sm-block text-capitalize">{{ __(str_replace(['user.', 'admin.', 'index'], '', Route::currentRouteName() ?? 'Dashboard')) }}</h5>
+                    @endif
                 </div>
                 
 
 
-                <div class="nav-actions">
+                <div class="nav-actions d-flex align-items-center gap-3">
+                    @yield('header_actions')
                     <!-- Language Switcher -->
                     <div class="dropdown">
-                        <div class="icon-btn" data-bs-toggle="dropdown" style="cursor: pointer;">
-                            <i class="bi bi-translate"></i> <span style="font-size:0.8rem; font-weight:bold;">{{ strtoupper(App::getLocale()) }}</span>
+                        <div class="icon-btn d-flex align-items-center gap-1 text-muted" data-bs-toggle="dropdown" style="cursor: pointer;">
+                            <i class="bi bi-translate fs-5"></i> <span style="font-size:0.75rem; font-weight:700;">{{ strtoupper(App::getLocale()) }}</span>
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                             <li><a class="dropdown-item" href="{{ route('lang.switch', 'en') }}">🇬🇧 {{ __('English') }}</a></li>

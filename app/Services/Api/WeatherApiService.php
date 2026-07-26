@@ -5,7 +5,6 @@ use App\Models\Country;
 use App\Models\WeatherCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 use Carbon\Carbon;
 
 class WeatherApiService
@@ -24,10 +23,10 @@ class WeatherApiService
         $countries = Country::whereNotNull('latitude')->whereNotNull('longitude')->get();
         $syncedData = collect();
 
-        // Sync Countries
+        // Sinkronisasi Negara
         foreach ($countries as $country) {
             try {
-                usleep(100000); // 100ms delay for Open-Meteo rate limits
+                usleep(100000); 
                 $lat = $country->latitude;
                 $lng = $country->longitude;
                 
@@ -35,6 +34,8 @@ class WeatherApiService
                     'latitude' => $lat,
                     'longitude' => $lng,
                     'current' => 'temperature_2m,relative_humidity_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,weather_code',
+                    'hourly' => 'temperature_2m',
+                    'forecast_days' => 2,
                     'timezone' => 'auto'
                 ]);
 
@@ -62,7 +63,7 @@ class WeatherApiService
             }
         }
 
-        // Sync Ports (Optimize: Only sync active ports used in shipments)
+        // Sinkronisasi Port
         $activePortIds = \App\Models\Shipment::pluck('destination_port_id')->merge(\App\Models\Shipment::pluck('origin_port_id'))->unique();
         $ports = \App\Models\Port::whereIn('id', $activePortIds)
                     ->whereNotNull('latitude')
@@ -71,7 +72,7 @@ class WeatherApiService
         
         foreach ($ports as $port) {
             try {
-                usleep(100000); // 100ms delay for Open-Meteo rate limits
+                usleep(100000); 
                 $lat = $port->latitude;
                 $lng = $port->longitude;
                 
@@ -79,6 +80,8 @@ class WeatherApiService
                     'latitude' => $lat,
                     'longitude' => $lng,
                     'current' => 'temperature_2m,relative_humidity_2m,surface_pressure,cloud_cover,visibility,wind_speed_10m,weather_code',
+                    'hourly' => 'temperature_2m',
+                    'forecast_days' => 2,
                     'timezone' => 'auto'
                 ]);
 

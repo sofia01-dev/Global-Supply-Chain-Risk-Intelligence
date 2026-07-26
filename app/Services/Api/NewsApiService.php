@@ -4,7 +4,6 @@ namespace App\Services\Api;
 use App\Models\NewsCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 use Carbon\Carbon;
 
 class NewsApiService
@@ -28,9 +27,8 @@ class NewsApiService
                     $articles = $json['articles'];
                     $syncedData = collect();
                     
-                    // Retrieve Lexicon Sentiment Service
+                    // Mengambil Layanan Sentimen Leksikon
                     $sentimentService = app(\App\Services\AI\LexiconSentimentService::class);
-                    // Remove random country mapping for global sync
                     
                     foreach ($articles as $article) {
                         $title = $article['title'] ?? '';
@@ -50,7 +48,7 @@ class NewsApiService
                         
                         $sentimentLabel = $sentimentService->analyzeText($content);
                         
-                        $countryId = null; // Global news remains global
+                        $countryId = null; 
 
                         $news = NewsCache::updateOrCreate(
                             ['url' => substr($article['url'], 0, 500)],
@@ -80,7 +78,7 @@ class NewsApiService
     {
         try {
             $apiKey = env('GNEWS_API_KEY', 'demo'); 
-            // Broaden search: any of these keywords + country name
+            // Perluas pencarian: salah satu kata kunci ini + nama negara
             $query = '("logistics" OR "supply chain" OR "economy" OR "trade") AND "' . $country->name . '"';
             
             $response = Http::timeout(15)->retry(2, 100)->get('https://gnews.io/api/v4/search', [
@@ -122,7 +120,7 @@ class NewsApiService
                                 'title' => substr($title, 0, 500),
                                 'image_url' => $article['image'] ?? null,
                                 'category' => $category,
-                                'country_id' => $country->id, // Specifically assign to this country
+                                'country_id' => $country->id, 
                                 'sentiment_label' => $sentimentLabel,
                                 'published_at' => isset($article['publishedAt']) ? Carbon::parse($article['publishedAt'])->format('Y-m-d H:i:s') : now(),
                             ]
@@ -156,7 +154,7 @@ class NewsApiService
             $query->where('country_id', $countryId);
         }
 
-        return $query->paginate(5)->withQueryString();
+        return $query->paginate(6)->withQueryString();
     }
 
     public function getCategoryStatistics()

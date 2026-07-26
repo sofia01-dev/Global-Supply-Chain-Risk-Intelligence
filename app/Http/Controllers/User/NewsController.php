@@ -54,7 +54,7 @@ class NewsController extends Controller
     {
         $this->newsApiService->syncNews();
         
-        // Re-fetch everything for the updated view
+        // Ambil ulang semuanya untuk tampilan yang telah diperbarui
         $search = $request->query('search');
         $category = $request->query('category');
         $countryId = $request->query('country');

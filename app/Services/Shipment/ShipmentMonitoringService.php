@@ -1,7 +1,6 @@
 <?php
 namespace App\Services\Shipment;
 
-use App\Models\RiskScore;
 use App\Models\WeatherCache;
 use App\Models\CurrencyCache;
 use App\Models\NewsCache;
@@ -17,7 +16,7 @@ class ShipmentMonitoringService
 
     public function monitor($shipment)
     {
-        // Destination context (Current Stage in reality would be the last arrived transit or origin if pending)
+    
         $histories = $shipment->histories()->orderBy('timestamp', 'desc')->get();
         $lastHistory = $histories->first();
         $currentLocation = $lastHistory ? $lastHistory->location_desc : ($shipment->originPort ? $shipment->originPort->name : 'Unknown');
@@ -25,7 +24,7 @@ class ShipmentMonitoringService
         $destPort = $shipment->destinationPort;
         $destCountry = $destPort ? $destPort->country : null;
         
-        // For risk monitoring, we monitor the Destination Country (or current stage country if we had a more complex model, but we'll use Destination here to predict ETA risk)
+        // For risk monitoring
         $monitorCountry = $destCountry;
 
         // Initialize risk data arrays
@@ -126,7 +125,6 @@ class ShipmentMonitoringService
                 $cScore = 50; // Base historical proxy
                 $changeStr = '-';
                 if ($currency->exchange_rate_usd > 0) {
-                    // Just a mock daily change indicator since we don't store historical in currency_caches currently
                     $mockChange = (rand(-50, 50) / 100); 
                     $changeStr = ($mockChange > 0 ? '+' : '') . $mockChange . '%';
                     $cScore = 50 + ($mockChange * 10);

@@ -94,7 +94,7 @@ class PortController extends Controller
 
     public function destroy(\App\Models\Port $port)
     {
-        // Check if port has associated shipments
+        // Periksa apakah pelabuhan memiliki pengiriman terkait.
         if ($port->shipmentsAsOrigin()->count() > 0 || $port->shipmentsAsDestination()->count() > 0) {
             return redirect()->route('admin.ports.index')->with('error', 'Cannot delete this port because it has associated shipment data.');
         }

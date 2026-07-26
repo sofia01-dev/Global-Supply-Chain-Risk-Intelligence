@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
+@section('header_actions')
+<div class="d-none d-md-flex align-items-center me-3">
+    <div class="bg-white rounded px-3 py-2 shadow-sm d-flex align-items-center gap-2 border" style="font-size: 0.75rem;">
+        <i class="bi bi-calendar3 text-muted"></i>
+        <span id="dashboard-time-indicator" class="fw-semibold text-dark">{{ now()->format('d M Y, H:i') }} WIB</span>
+        <i class="bi bi-arrow-repeat text-muted ms-2" style="cursor:pointer;" onclick="fetchDashboardData()" title="Force Sync"></i>
+    </div>
+</div>
+@endsection
+
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Header Area is handled by layouts.app top-navbar, but we add our title here -->
-    <div class="d-flex justify-content-end align-items-end mb-3">
-        <div class="d-none d-md-flex align-items-center gap-2">
-            <!-- Sync Time Indicator -->
-            <div class="bg-white rounded px-3 py-2 shadow-sm d-flex align-items-center gap-2 border" style="font-size: 0.75rem;">
-                <i class="bi bi-calendar3 text-muted"></i>
-                <span id="dashboard-time-indicator" class="fw-semibold text-dark">{{ now()->format('d M Y, H:i') }} WIB</span>
-                <i class="bi bi-arrow-repeat text-muted ms-2" style="cursor:pointer;" onclick="fetchDashboardData()" title="Force Sync"></i>
-            </div>
-        </div>
-    </div>
+
 
     <!-- ROW 1: Summary Cards -->
     <div class="row row-cols-1 row-cols-md-3 row-cols-xl-5 g-3 mb-4" id="summary-container">
@@ -315,34 +315,76 @@
                 </div>
             </div>
 
-            <!-- News Category Chart -->
-            <div class="card border-0 shadow-sm rounded-4 flex-grow-1">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0 text-dark">{{ __('Global News Category') }} <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.8rem;"></i></h6>
-                    <select class="form-select form-select-sm border-0 bg-light rounded-pill px-3" style="width: 90px;">
-                        <option>7 Days</option>
-                    </select>
+            <!-- Recent Currency Updates -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <h6 class="fw-bold mb-0 text-dark">{{ __('Recent Currency Updates') }}</h6>
+                    <a href="{{ route('user.currency') }}" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold text-primary" style="font-size: 0.75rem; border: 1px solid #e0e0e0;">{{ __('View All') }}</a>
                 </div>
-                <div class="card-body p-3 d-flex flex-column justify-content-center position-relative">
-                    <div style="position: relative; height: 200px; width: 100%;">
-                        <canvas id="newsCategoryChart"></canvas>
-                        <!-- Center text for Doughnut -->
-                        <div class="position-absolute top-50 start-50 translate-middle text-center" style="pointer-events: none;">
-                            <span class="text-muted" style="font-size:0.7rem;">Total News</span><br>
-                            <span class="fw-bold text-dark fs-5" id="news-total">{{ $newsCategoryData['total'] ?? 0 }}</span>
-                        </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-hover align-middle mb-0" style="font-size: 0.8rem;">
+                            <thead class="border-bottom" style="background-color: #fcfcfc;">
+                                <tr>
+                                    <th class="text-muted fw-semibold py-3 ps-5">{{ __('Time') }}</th>
+                                    <th class="text-muted fw-semibold py-3">{{ __('Currency Pair') }}</th>
+                                    <th class="text-muted fw-semibold py-3">{{ __('Rate') }}</th>
+                                    <th class="text-muted fw-semibold py-3">{{ __('Change') }}</th>
+                                    <th class="text-muted fw-semibold py-3 text-end pe-5">{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-bottom">
+                                    <td class="ps-5 text-dark fw-medium">10:30 AM</td>
+                                    <td class="text-dark fw-semibold">USD / IDR</td>
+                                    <td class="text-dark">16,350</td>
+                                    <td class="text-success fw-bold"><i class="bi bi-caret-up-fill small"></i> 0.82%</td>
+                                    <td class="text-end pe-5"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-semibold">Bullish</span></td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="ps-5 text-dark fw-medium">10:30 AM</td>
+                                    <td class="text-dark fw-semibold">USD / CNY</td>
+                                    <td class="text-dark">7.1205</td>
+                                    <td class="text-danger fw-bold"><i class="bi bi-caret-down-fill small"></i> 0.20%</td>
+                                    <td class="text-end pe-5"><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-semibold">Stable</span></td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="ps-5 text-dark fw-medium">10:30 AM</td>
+                                    <td class="text-dark fw-semibold">EUR / USD</td>
+                                    <td class="text-dark">1.0824</td>
+                                    <td class="text-success fw-bold"><i class="bi bi-caret-up-fill small"></i> 0.15%</td>
+                                    <td class="text-end pe-5"><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-semibold">Moderate</span></td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="ps-5 text-dark fw-medium">10:30 AM</td>
+                                    <td class="text-dark fw-semibold">GBP / USD</td>
+                                    <td class="text-dark">1.2634</td>
+                                    <td class="text-success fw-bold"><i class="bi bi-caret-up-fill small"></i> 0.21%</td>
+                                    <td class="text-end pe-5"><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-semibold">Bullish</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-5 text-dark fw-medium">10:30 AM</td>
+                                    <td class="text-dark fw-semibold">JPY / USD</td>
+                                    <td class="text-dark">0.00648</td>
+                                    <td class="text-danger fw-bold"><i class="bi bi-caret-down-fill small"></i> 0.12%</td>
+                                    <td class="text-end pe-5"><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-semibold">Stable</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="mt-3" id="news-legend">
-                        <!-- Legend generated by JS -->
-                    </div>
+                </div>
+                <div class="card-footer bg-white border-top py-3 text-center rounded-bottom-4">
+                    <span class="text-muted" style="font-size: 0.75rem;">All times in WIB (UTC+7)</span>
                 </div>
             </div>
 
+
+
         </div>
 
-        <!-- Right Column: AI Recommendation Redesign -->
-        <div class="col-xl-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100 position-relative">
+        <!-- Right Column: AI Recommendation & Latest News -->
+        <div class="col-xl-6 d-flex flex-column gap-4">
+            <div class="card border-0 shadow-sm rounded-4 position-relative">
                 <div class="card-body p-4 d-flex flex-column">
                     
                     <!-- Header -->
@@ -459,21 +501,47 @@
                     </div>
                     @endif
                 </div>
+                </div>
             </div>
-        </div>
+
     </div>
 
-    <!-- ROW 5: Latest Global News -->
+    <!-- ROW 5: Global News Category & Latest Global News -->
     <div class="row g-4 mb-4">
-        <!-- Latest News -->
-        <div class="col-xl-12">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
+        <!-- Left Column: News Category Chart -->
+        <div class="col-xl-4 d-flex flex-column gap-4">
+            <div class="card border-0 shadow-sm rounded-4 flex-grow-1">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">{{ __('Global News Category') }} <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.8rem;"></i></h6>
+                    <select class="form-select form-select-sm border-0 bg-light rounded-pill px-3" style="width: 90px;">
+                        <option>7 Days</option>
+                    </select>
+                </div>
+                <div class="card-body p-3 d-flex flex-column justify-content-center position-relative">
+                    <div style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="newsCategoryChart"></canvas>
+                        <!-- Center text for Doughnut -->
+                        <div class="position-absolute top-50 start-50 translate-middle text-center" style="pointer-events: none;">
+                            <span class="text-muted" style="font-size:0.8rem;">Total News</span><br>
+                            <span class="fw-bold text-dark fs-3" id="news-total">{{ $newsCategoryData['total'] ?? 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 px-2" id="news-legend">
+                        <!-- Legend generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Latest Global News -->
+        <div class="col-xl-8 d-flex flex-column gap-4">
+            <div class="card border-0 shadow-sm rounded-4 flex-grow-1">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center border-bottom">
                     <h6 class="fw-bold mb-0 text-dark">{{ __('Latest Global News') }} <i class="bi bi-info-circle text-muted ms-1" style="font-size: 0.8rem;"></i></h6>
-                    <a href="{{ route('user.news') }}" class="btn btn-sm text-primary fw-semibold">{{ __('View All') }}</a>
+                    <a href="{{ route('user.news') }}" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold text-primary" style="font-size: 0.75rem; border: 1px solid #e0e0e0;">{{ __('View All') }}</a>
                 </div>
                 <div class="card-body p-0">
-                    <div class="row g-0">
+                    <div class="d-flex flex-column">
                         @forelse($latestNews as $news)
                             @php
                                 $sColor = $news->sentiment_label == 'Negative' ? 'danger' : ($news->sentiment_label == 'Positive' ? 'success' : 'warning');
@@ -481,25 +549,22 @@
                                 else if($sColor == 'danger') $sColorStyle = "background-color: #FFEBEE; color: #dc3545;";
                                 else $sColorStyle = "background-color: #E8F5E9; color: #198754;";
                             @endphp
-                            <div class="col-md-6 border-bottom {{ $loop->iteration % 2 != 0 ? 'border-end' : '' }}">
-                                <a href="{{ $news->url }}" target="_blank" class="d-block p-4 text-decoration-none h-100 list-group-item-action">
-                                    <div class="d-flex gap-3">
-                                        <!-- Thumbnail -->
-                                        <div class="rounded-3 overflow-hidden bg-light" style="width: 80px; height: 80px; flex-shrink: 0;">
-                                            <img src="{{ $news->image_url ?? 'https://picsum.photos/150/150?random='.$loop->index }}" alt="News" style="width: 100%; height: 100%; object-fit: cover;">
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-2 text-dark fw-bold" style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">{{ $news->title }}</h6>
-                                            <div class="d-flex align-items-center justify-content-between mt-auto">
-                                                <span class="badge rounded-pill" style="{{ $sColorStyle }} font-weight: 600; font-size: 0.7rem; padding: 0.35em 0.65em;">{{ __($news->sentiment_label ?? 'Neutral') }}</span>
-                                                <span class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-calendar3 me-1"></i> {{ \Carbon\Carbon::parse($news->published_at)->format('M d, Y') }}</span>
-                                            </div>
+                            <a href="{{ $news->url }}" target="_blank" class="d-block p-4 text-decoration-none list-group-item-action {{ !$loop->last ? 'border-bottom' : '' }}">
+                                <div class="d-flex gap-3">
+                                    <div class="rounded-3 overflow-hidden bg-light" style="width: 80px; height: 80px; flex-shrink: 0;">
+                                        <img src="{{ $news->image_url ?? 'https://picsum.photos/150/150?random='.$loop->index }}" alt="News" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2 text-dark fw-bold" style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">{{ $news->title }}</h6>
+                                        <div class="d-flex align-items-center justify-content-between mt-auto">
+                                            <span class="badge rounded-pill" style="{{ $sColorStyle }} font-weight: 600; font-size: 0.7rem; padding: 0.35em 0.65em;">{{ __($news->sentiment_label ?? 'Neutral') }}</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-calendar3 me-1"></i> {{ \Carbon\Carbon::parse($news->published_at)->format('M d, Y') }}</span>
                                         </div>
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            </a>
                         @empty
-                            <div class="col-12 p-5 text-center text-muted">
+                            <div class="p-5 text-center text-muted">
                                 <i class="bi bi-newspaper fs-1 mb-3 d-block"></i>
                                 {{ __('No recent news available.') }}
                             </div>
@@ -509,6 +574,7 @@
             </div>
         </div>
     </div>
+
 
     @if(isset($adminArticles) && $adminArticles->count() > 0)
     <!-- ROW 6: Admin Articles / Expert Analysis -->
@@ -522,25 +588,29 @@
                     <div class="row g-4">
                         @foreach($adminArticles as $article)
                         <div class="col-md-3 col-sm-6">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                                @if($article->image)
-                                <img src="{{ $article->image }}" class="card-img-top" alt="{{ $article->title }}" style="height: 140px; object-fit: cover;">
-                                @else
-                                <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 140px;">
-                                    <i class="bi bi-file-earmark-text text-primary fs-1"></i>
-                                </div>
-                                @endif
-                                <div class="card-body p-3 d-flex flex-column">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="badge bg-light text-primary" style="font-size: 0.7rem;">{{ $article->category ?? 'Analysis' }}</span>
-                                        <span class="text-muted" style="font-size: 0.7rem;">{{ $article->created_at->format('M d, Y') }}</span>
+                            <a href="{{ route('user.articles.show', $article->id) }}" class="text-decoration-none text-dark">
+                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                                    @if($article->image_path)
+                                    <img src="{{ Storage::url($article->image_path) }}" class="card-img-top" alt="{{ $article->title }}" style="height: 140px; object-fit: cover;">
+                                    @elseif($article->image)
+                                    <img src="{{ $article->image }}" class="card-img-top" alt="{{ $article->title }}" style="height: 140px; object-fit: cover;">
+                                    @else
+                                    <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 140px;">
+                                        <i class="bi bi-file-earmark-text text-primary fs-1"></i>
                                     </div>
-                                    <h6 class="card-title fw-bold text-dark mb-2" style="font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $article->title }}</h6>
-                                    <p class="card-text text-muted small mt-auto" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem;">
-                                        {{ strip_tags($article->content) }}
-                                    </p>
+                                    @endif
+                                    <div class="card-body p-3 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-light text-primary" style="font-size: 0.7rem;">{{ $article->category ?? 'Analysis' }}</span>
+                                            <span class="text-muted" style="font-size: 0.7rem;">{{ $article->created_at->format('M d, Y') }}</span>
+                                        </div>
+                                        <h6 class="card-title fw-bold text-dark mb-2" style="font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $article->title }}</h6>
+                                        <p class="card-text text-muted small mt-auto" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.75rem;">
+                                            {{ strip_tags($article->content) }}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         @endforeach
                     </div>
@@ -681,15 +751,17 @@ function initNewsChart() {
         }
     });
 
-    let legendHtml = '<div class="d-flex justify-content-between flex-wrap gap-2">';
+    let legendHtml = '<div class="row g-3">';
     if(data.labels && data.labels.length > 0) {
         data.labels.forEach((label, i) => {
             let pct = data.total > 0 ? Math.round((data.data[i] / data.total) * 100) : 0;
             legendHtml += `
-            <div class="d-flex align-items-center gap-2" style="font-size:0.75rem;">
-                <span style="width:8px;height:8px;border-radius:50%;background-color:${colors[i]}"></span>
-                <span class="text-muted">${label}</span>
-                <span class="fw-bold">${data.data[i]} (${pct}%)</span>
+            <div class="col-6">
+                <div class="d-flex align-items-center gap-2" style="font-size:0.8rem;">
+                    <span style="width:10px;height:10px;border-radius:50%;background-color:${colors[i]}"></span>
+                    <span class="text-muted">${label}</span>
+                    <span class="fw-bold ms-auto">${data.data[i]} (${pct}%)</span>
+                </div>
             </div>`;
         });
     }

@@ -2,7 +2,6 @@
 namespace App\Services\Dashboard;
 
 use App\Models\Country;
-use App\Models\RiskScore;
 use App\Models\NewsCache;
 
 class CountryDashboardService
@@ -25,17 +24,15 @@ class CountryDashboardService
         $country = Country::with(['weatherCaches', 'newsCaches', 'economicIndicator', 'riskScores'])->find($id);
         if (!$country) return null;
 
-        // Fetch currency cache
+        // Mengambil cache mata uang
         $currency = null;
         if ($country->currency_code) {
             $currency = \App\Models\CurrencyCache::where('currency_code', $country->currency_code)->first();
         }
         $country->currentCurrency = $currency;
 
-        // Fetch specific country news
         $newsList = $country->newsCaches()->latest()->take(5)->get();
 
-        // On-demand fetching: if no recent news (< 24h), fetch it from API
         $needsSync = true;
         if ($newsList->isNotEmpty()) {
             $latestNews = $newsList->first();
@@ -48,11 +45,10 @@ class CountryDashboardService
             $newsApiService = app(\App\Services\Api\NewsApiService::class);
             $syncedNews = $newsApiService->syncNewsForCountry($country);
             if ($syncedNews->isNotEmpty()) {
-                $newsList = $country->newsCaches()->latest()->take(5)->get(); // refresh from DB
+                $newsList = $country->newsCaches()->latest()->take(5)->get(); 
             }
         }
 
-        // Fallback to global news if API returns no country-specific results (e.g. very small country)
         if ($newsList->isEmpty()) {
             $newsList = NewsCache::whereNull('country_id')->latest()->take(5)->get();
         }

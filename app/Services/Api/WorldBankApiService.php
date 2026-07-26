@@ -5,7 +5,6 @@ use App\Models\Country;
 use App\Models\EconomicIndicator;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class WorldBankApiService
 {
@@ -13,7 +12,7 @@ class WorldBankApiService
     {
         $countries = Country::whereNotNull('iso2_code')->get();
         $syncedData = collect();
-        $year = date('Y') - 1; // Generally World Bank has data from previous year
+        $year = date('Y') - 1; 
 
         foreach ($countries as $country) {
             try {
@@ -41,7 +40,6 @@ class WorldBankApiService
                 }
             } catch (\Throwable $e) {
                 Log::error("WorldBankApiService Error for country {$country->iso2_code}: " . $e->getMessage());
-                // Continue to next country instead of breaking the entire loop
             }
         }
         return $syncedData;
@@ -49,7 +47,7 @@ class WorldBankApiService
 
     private function fetchIndicator($iso2, $indicatorCode)
     {
-        usleep(50000); // 50ms delay to prevent rate limiting
+        usleep(50000); 
         $response = Http::timeout(15)->retry(3, 200)->get("https://api.worldbank.org/v2/country/{$iso2}/indicator/{$indicatorCode}?format=json&per_page=5");
         
         if ($response->successful()) {
@@ -70,7 +68,7 @@ class WorldBankApiService
 
     public function fetchGlobalHistoricalTrend($indicatorCode, $yearsBack = 7)
     {
-        $currentYear = date('Y') - 1; // Bank data usually lags by 1 year
+        $currentYear = date('Y') - 1; 
         $startYear = $currentYear - $yearsBack + 1;
         
         $url = "https://api.worldbank.org/v2/country/WLD/indicator/{$indicatorCode}?date={$startYear}:{$currentYear}&format=json";
@@ -87,7 +85,6 @@ class WorldBankApiService
                             $data[$record['date']] = $record['value'];
                         }
                     }
-                    // Sort by year ascending
                     ksort($data);
                     return $data;
                 }

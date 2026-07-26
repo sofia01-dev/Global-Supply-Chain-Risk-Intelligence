@@ -72,4 +72,9 @@ class CountryApiService
         }
         return collect([]);
     }
+
+        public function getAllCountries()
+    {
+        return Country::orderBy('name')->get();
+    }
 }

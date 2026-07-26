@@ -6,7 +6,6 @@ use App\Models\Shipment;
 use App\Models\NewsCache;
 use App\Models\RiskScore;
 use App\Models\WeatherCache;
-use App\Models\CurrencyCache;
 use App\Services\AI\LexiconSentimentService;
 use App\Services\Api\WorldBankApiService;
 use Illuminate\Support\Facades\Cache;
@@ -227,7 +226,6 @@ class DashboardService
     {
         return Cache::remember('weather_trend_data_7d_live', 3600, function() {
             try {
-                // Fetch actual past 7 days weather for a major global shipping hub (Singapore) as proxy for Global Avg
                 $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://api.open-meteo.com/v1/forecast', [
                     'latitude' => 1.29,
                     'longitude' => 103.85,
@@ -248,7 +246,7 @@ class DashboardService
                         $labels[] = \Carbon\Carbon::parse($time)->format('d M');
                         $temp[] = round($daily['temperature_2m_mean'][$i] ?? 25, 1);
                         $wind[] = round($daily['wind_speed_10m_max'][$i] ?? 15, 1);
-                        // Approximate humidity globally based on precipitation
+                        // Perkiraan kelembapan global berdasarkan curah hujan
                         $precip = $daily['precipitation_sum'][$i] ?? 0;
                         $humidity[] = round(65 + min(25, $precip * 1.5), 1);
                     }
@@ -261,10 +259,9 @@ class DashboardService
                     ];
                 }
             } catch (\Exception $e) {
-                // Ignore and use fallback
             }
             
-            // Fallback (Flatline) if API is unreachable
+            // Cadangan jika API tidak dapat dijangkau
             $labels = [];
             $temp = [];
             $humidity = [];
@@ -314,11 +311,10 @@ class DashboardService
             if ($rawData && count($rawData) > 0) {
                 foreach ($rawData as $year => $value) {
                     $labels[] = (string)$year;
-                    // Convert raw USD to Trillions
+                    // Konversi nilai USD mentah menjadi triliunan
                     $datasets['Global GDP (Trillion USD)'][] = round($value / 1000000000000, 2);
                 }
             } else {
-                // Fallback safe simulation if API fails entirely
                 $baseGdp = 104.5;
                 for($i = 6; $i >= 0; $i--) {
                     $labels[] = \Carbon\Carbon::now()->subYears($i)->format('Y');
@@ -351,7 +347,6 @@ class DashboardService
                     $datasets['Global Inflation (%)'][] = round($value, 2);
                 }
             } else {
-                // Fallback safe simulation
                 $baseInflation = 5.8;
                 for($i = 6; $i >= 0; $i--) {
                     $labels[] = \Carbon\Carbon::now()->subYears($i)->format('Y');
@@ -416,8 +411,6 @@ class DashboardService
         $newUsers = \App\Models\User::where('created_at', '>=', $startOfMonth)->count();
         $newPorts = \App\Models\Port::where('created_at', '>=', $startOfMonth)->count();
         $newArticles = \App\Models\Article::where('created_at', '>=', $startOfMonth)->count();
-
-        // Check if there's any data
         $apiStatus = $lastSyncDate && now()->diffInHours($lastSyncDate) < 48 ? 'Online' : 'Warning';
 
         // Datasets

@@ -5,7 +5,6 @@ use App\Models\Country;
 use App\Models\Port;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class PortApiService
 {
@@ -29,7 +28,6 @@ class PortApiService
         }
 
         $data = $response->json();
-        // tayljordan/ports dataset has a 'ports' array inside the JSON response
         $portsList = isset($data['ports']) ? $data['ports'] : $data;
 
         $stats = [
@@ -40,7 +38,7 @@ class PortApiService
             'reasons' => []
         ];
 
-        // Cache countries for performance to avoid N queries
+        // Simpan data negara dalam cache
         $countries = Country::all()->keyBy(function ($item) {
             return strtolower($item->name);
         });
@@ -49,7 +47,7 @@ class PortApiService
             return strtolower($item->iso2_code);
         });
 
-        // Some mapping rules for country names that differ
+        // Beberapa aturan pemetaan untuk nama negara yang berbeda
         $countryNameMapping = [
             'united states' => 'united states of america',
             'russia' => 'russian federation',
@@ -83,7 +81,6 @@ class PortApiService
                 continue;
             }
 
-            // Generate UNLOCODE fallback using wpi_port_id (padded to 5 chars to fit unique constraint)
             $unlocode = str_pad((string)$wpiPortId, 5, '0', STR_PAD_LEFT);
 
             $countryNameLower = strtolower($countryName);
@@ -93,15 +90,14 @@ class PortApiService
 
             $countryId = null;
             
-            // Try by exact name
             if (isset($countries[$countryNameLower])) {
                 $countryId = $countries[$countryNameLower]->id;
             } 
-            // Try by iso2
+            // Coba dengan iso2
             elseif (isset($isoCountries[$countryNameLower])) {
                 $countryId = $isoCountries[$countryNameLower]->id;
             }
-            // Try partial match
+            
             if (!$countryId) {
                 $country = Country::where('name', 'LIKE', '%' . $countryName . '%')->first();
                 if ($country) {

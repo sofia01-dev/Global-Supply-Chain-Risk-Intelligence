@@ -80,5 +80,8 @@ Route::middleware('auth')->group(function () {
         // Ports
         Route::get('/user/ports', [\App\Http\Controllers\User\PortController::class, 'index'])->name('user.ports.index');
         Route::get('/user/ports/{id}', [\App\Http\Controllers\User\PortController::class, 'show'])->name('user.ports.show');
+        
+        // Articles
+        Route::get('/user/articles/{id}', [\App\Http\Controllers\User\ArticleController::class, 'show'])->name('user.articles.show');
     });
 });

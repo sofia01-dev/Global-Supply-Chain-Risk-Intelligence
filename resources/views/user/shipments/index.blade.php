@@ -1,11 +1,19 @@
 @extends('layouts.app')
-@section('content')
-<div class="row mb-4">
-    <div class="col d-flex justify-content-between align-items-center">
-        <h2 class="mb-0 fw-bold">{{ __('My Shipments') }}</h2>
-        <a href="{{ route('user.shipments.create') }}" class="btn fw-bold px-4 rounded-pill shadow-sm text-white" style="background-color: var(--primary-navy);"><i class="bi bi-plus-lg me-1"></i> {{ __('Create Shipment') }}</a>
-    </div>
+
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('My Shipments') }}</h5>
+    <div class="text-muted" style="font-size: 0.75rem;">{{ __('Track, manage, and monitor all your global logistics in real-time.') }}</div>
 </div>
+@endsection
+
+@section('header_actions')
+<div class="d-flex align-items-center me-2">
+    <a href="{{ route('user.shipments.create') }}" class="btn btn-sm fw-bold px-3 rounded-pill shadow-sm text-white" style="background-color: var(--primary-navy);"><i class="bi bi-plus-lg me-1"></i> {{ __('Create Shipment') }}</a>
+</div>
+@endsection
+
+@section('content')
 
 <!-- Search & Filter Card -->
 <div class="card border-0 shadow-sm mb-4 bg-white rounded-3">
