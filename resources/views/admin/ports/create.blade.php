@@ -89,15 +89,20 @@
 
             <h6 class="fw-bold mb-4 border-bottom pb-2">Geographical Coordinates</h6>
 
+            <div class="alert alert-info" style="border-radius: 8px; font-size: 0.85rem; padding: 10px 15px;">
+                <i class="bi bi-info-circle me-2"></i> Klik titik manapun pada peta di bawah ini untuk mengisi angka Latitude & Longitude secara otomatis.
+            </div>
+            <div id="map" style="height: 350px; width: 100%; border-radius: 8px; margin-bottom: 20px; z-index: 1; border: 1px solid #ddd;"></div>
+
             <div class="row g-4 mb-5">
                 <div class="col-md-6">
                     <label class="form-label">Latitude</label>
-                    <input type="number" step="any" name="latitude" class="form-control" value="{{ old('latitude') }}" placeholder="e.g. -6.1431" required>
+                    <input type="number" step="any" id="latitudeInput" name="latitude" class="form-control" value="{{ old('latitude') }}" placeholder="e.g. -6.1431" required>
                     <div class="form-text" style="font-size: 0.75rem;">Range: -90 to 90</div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Longitude</label>
-                    <input type="number" step="any" name="longitude" class="form-control" value="{{ old('longitude') }}" placeholder="e.g. 106.8706" required>
+                    <input type="number" step="any" id="longitudeInput" name="longitude" class="form-control" value="{{ old('longitude') }}" placeholder="e.g. 106.8706" required>
                     <div class="form-text" style="font-size: 0.75rem;">Range: -180 to 180</div>
                 </div>
             </div>
@@ -112,3 +117,66 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi peta dengan koordinat awal (Fokus ke Indonesia, zoom 5)
+        var map = L.map('map').setView([-0.7893, 113.9213], 5);
+        
+        // Memuat tile layer dari Google Maps (Standard Streets)
+        L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0','mt1','mt2','mt3'],
+            attribution: '&copy; Google Maps'
+        }).addTo(map);
+
+        var marker = null;
+        var latInput = document.getElementById('latitudeInput');
+        var lngInput = document.getElementById('longitudeInput');
+
+        // Jika ada nilai lama (misal error validasi form), tampilkan pin
+        if(latInput.value && lngInput.value) {
+            var lat = parseFloat(latInput.value);
+            var lng = parseFloat(lngInput.value);
+            marker = L.marker([lat, lng]).addTo(map);
+            map.setView([lat, lng], 8);
+        }
+
+        // Event listener saat pengguna mengklik titik pada peta
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+            
+            // Format ke 6 angka desimal agar rapi
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+
+            // Geser pin ke titik yang diklik
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+        });
+
+        // Event listener jika pengguna mengetik koordinat manual, peta ikut bergeser
+        function updateMapFromInput() {
+            var lat = parseFloat(latInput.value);
+            var lng = parseFloat(lngInput.value);
+            
+            if(!isNaN(lat) && !isNaN(lng)) {
+                if(marker) {
+                    marker.setLatLng([lat, lng]);
+                } else {
+                    marker = L.marker([lat, lng]).addTo(map);
+                }
+                map.setView([lat, lng], map.getZoom() > 5 ? map.getZoom() : 8);
+            }
+        }
+
+        latInput.addEventListener('input', updateMapFromInput);
+        lngInput.addEventListener('input', updateMapFromInput);
+    });
+</script>
+@endpush

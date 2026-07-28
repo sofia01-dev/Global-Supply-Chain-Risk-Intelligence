@@ -1,5 +1,20 @@
 @extends('layouts.app')
 
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">{{ __('Dashboard') }}</h5>
+    <div class="text-muted" style="font-size: 0.8rem;">{{ __('System overview and general statistics') }}</div>
+</div>
+@endsection
+
+@section('header_actions')
+<div class="d-none d-md-flex align-items-center me-3">
+    <div class="bg-white rounded px-3 py-2 shadow-sm d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem; border: 1px solid #e0e0e0;">
+        <i class="bi bi-calendar3 text-primary"></i> 
+        <span class="fw-medium">{{ $summary['serverTime'] ?? now()->format('d M Y, H:i') . ' WIB' }}</span>
+    </div>
+</div>
+@endsection
 @push('styles')
 <style>
     /* Admin Dashboard Specific Styles */
@@ -112,18 +127,7 @@
 
 @section('content')
 <div class="container-fluid py-2">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 fw-bold text-dark">{{ __('Dashboard') }}</h4>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">{{ __('System overview and general statistics') }}</p>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <div class="bg-white border rounded px-3 py-2 text-muted" style="font-size: 0.85rem;">
-                <i class="bi bi-calendar3 me-2"></i> {{ $summary['serverTime'] ?? now()->format('d M Y, H:i') . ' WIB' }}
-            </div>
-        </div>
-    </div>
+
 
     <!-- KPIs Row -->
     <div class="row g-3 mb-4">

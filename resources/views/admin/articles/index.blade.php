@@ -1,5 +1,23 @@
 @extends('layouts.app')
 
+@section('page_header')
+<div class="d-none d-sm-block">
+    <h5 class="m-0 fw-semibold text-dark">Analysis Articles</h5>
+    <div class="text-muted" style="font-size: 0.8rem;">Kelola artikel analisis dan insight terkait risiko rantai pasok global</div>
+</div>
+@endsection
+
+@section('header_actions')
+<div class="d-none d-md-flex align-items-center gap-3 me-3">
+    <div class="bg-white rounded px-3 py-2 shadow-sm d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem; border: 1px solid #e0e0e0;">
+        <i class="bi bi-calendar3 text-primary"></i> 
+        <span class="fw-medium">{{ now()->format('d M Y, H:i') }} WIB</span>
+    </div>
+    <a href="{{ route('admin.articles.create') }}" class="btn btn-navy" style="border-radius: 8px; font-size: 0.85rem;">
+        <i class="bi bi-plus-lg me-1"></i> Artikel Baru
+    </a>
+</div>
+@endsection
 @push('styles')
 <style>
     .admin-card {
@@ -8,25 +26,15 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         background-color: #fff;
     }
-    .kpi-card {
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    .kpi-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .admin-card-title { font-size: 0.85rem; font-weight: 600; color: #666; margin-bottom: 5px; }
+    .admin-card-value { font-size: 1.8rem; font-weight: 700; color: #333; margin-bottom: 0; }
+    .admin-card-sub { font-size: 0.75rem; color: #888; font-weight: 500; }
+    .admin-icon-box {
+        width: 48px; height: 48px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
         font-size: 1.5rem;
     }
-    .kpi-icon.primary { background: rgba(28, 85, 255, 0.1); color: #1C55FF; }
-    .kpi-icon.success { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-    .kpi-icon.warning { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
-    .kpi-icon.info { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
     
     .table-container {
         overflow-x: auto;
@@ -129,69 +137,63 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 fw-bold text-dark">Analysis Articles</h4>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola artikel analisis dan insight terkait risiko rantai pasok global</p>
-        </div>
-        <div class="d-flex gap-3 align-items-center">
-            <div class="text-muted" style="font-size: 0.85rem;">
-                <i class="bi bi-calendar3 me-1"></i> {{ now()->format('d M Y, H:i') }} WIB
-            </div>
-            <a href="{{ route('admin.articles.create') }}" class="btn btn-navy" style="border-radius: 8px;">
-                <i class="bi bi-plus-lg me-1"></i> Artikel Baru
-            </a>
-        </div>
-    </div>
+
 
     <!-- KPIs -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="admin-card card kpi-card">
-                <div class="kpi-icon primary">
-                    <i class="bi bi-file-text"></i>
-                </div>
-                <div>
-                    <div class="text-muted mb-1" style="font-size: 0.75rem; font-weight:600;">Total Artikel</div>
-                    <div class="fs-4 fw-bold text-dark mb-0" style="line-height: 1;">{{ $totalArticles }}</div>
-                    <div class="text-muted mt-1" style="font-size: 0.7rem;">Semua artikel</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="admin-card card kpi-card">
-                <div class="kpi-icon success">
-                    <i class="bi bi-check-circle"></i>
-                </div>
-                <div>
-                    <div class="text-muted mb-1" style="font-size: 0.75rem; font-weight:600;">Dipublikasikan</div>
-                    <div class="fs-4 fw-bold text-dark mb-0" style="line-height: 1;">{{ $publishedArticles }}</div>
-                    <div class="text-muted mt-1" style="font-size: 0.7rem;">{{ $publishedPercentage }}% dari total</div>
+            <div class="admin-card card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="admin-card-title">Total Artikel</div>
+                        <div class="admin-card-value">{{ number_format($totalArticles) }}</div>
+                        <div class="admin-card-sub">Semua artikel</div>
+                    </div>
+                    <div class="admin-icon-box" style="background-color: #e3f2fd; color: #1565c0;">
+                        <i class="bi bi-file-text"></i>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="admin-card card kpi-card">
-                <div class="kpi-icon warning">
-                    <i class="bi bi-file-earmark-text"></i>
-                </div>
-                <div>
-                    <div class="text-muted mb-1" style="font-size: 0.75rem; font-weight:600;">Draft</div>
-                    <div class="fs-4 fw-bold text-dark mb-0" style="line-height: 1;">{{ $draftArticles }}</div>
-                    <div class="text-muted mt-1" style="font-size: 0.7rem;">Belum dipublikasikan</div>
+            <div class="admin-card card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="admin-card-title">Dipublikasikan</div>
+                        <div class="admin-card-value">{{ number_format($publishedArticles) }}</div>
+                        <div class="admin-card-sub">{{ $publishedPercentage }}% dari total</div>
+                    </div>
+                    <div class="admin-icon-box" style="background-color: #e8f5e9; color: #2e7d32;">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="admin-card card kpi-card">
-                <div class="kpi-icon info">
-                    <i class="bi bi-clock-history"></i>
+            <div class="admin-card card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="admin-card-title">Draft</div>
+                        <div class="admin-card-value">{{ number_format($draftArticles) }}</div>
+                        <div class="admin-card-sub">Belum dipublikasikan</div>
+                    </div>
+                    <div class="admin-icon-box" style="background-color: #fff3e0; color: #ef6c00;">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
                 </div>
-                <div>
-                    <div class="text-muted mb-1" style="font-size: 0.75rem; font-weight:600;">Terakhir Diperbarui</div>
-                    <div class="fs-5 fw-bold text-dark mb-0" style="line-height: 1;">{{ $latestArticle ? $latestArticle->updated_at->format('d M Y') : '-' }}</div>
-                    <div class="text-muted mt-1" style="font-size: 0.7rem;">{{ $latestArticle ? $latestArticle->updated_at->format('H:i') . ' WIB' : '' }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-card card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="admin-card-title">Terakhir Diperbarui</div>
+                        <div class="admin-card-value" style="font-size: 1.3rem;">{{ $latestArticle ? $latestArticle->updated_at->format('d M Y') : '-' }}</div>
+                        <div class="admin-card-sub">{{ $latestArticle ? $latestArticle->updated_at->format('H:i') . ' WIB' : '' }}</div>
+                    </div>
+                    <div class="admin-icon-box" style="background-color: #f3e5f5; color: #6a1b9a;">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
                 </div>
             </div>
         </div>
